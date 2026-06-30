@@ -410,6 +410,234 @@
                 ]
             }
         },
+        cs: {
+            1: {
+                t1: [
+                    { name: "لغة إنجليزية", hours: 2, isElective: false },
+                    { name: "مقدمة في الحاسب", hours: 2, isElective: false },
+                    { name: "كيمياء غير عضوية وفيزيائية", hours: 3, isElective: false },
+                    { name: "فيزياء عامة 1", hours: 3, isElective: false },
+                    { name: "تفاضل وتكامل 1", hours: 3, isElective: false },
+                    { name: "أساسيات الرياضيات البحتة والتطبيقية", hours: 2, isElective: true, group: "cs_g1", id: "cs_pure_math" },
+                    { name: "رياضيات اكتوارية", hours: 2, isElective: true, group: "cs_g1", id: "cs_actuarial" },
+                    { name: "مبادئ إدارة", hours: 2, isElective: true, group: "cs_g2", id: "cs_admin" },
+                    { name: "ثقافة بيئية", hours: 2, isElective: true, group: "cs_g2", id: "cs_env" }
+                ],
+                t2: [
+                    { name: "التفكير العلمي والكتابة العلمية", hours: 2, isElective: false },
+                    { name: "مبادئ برمجة", hours: 2, isElective: false },
+                    { name: "تفاضل وتكامل 2", hours: 2, isElective: false },
+                    { name: "جبر", hours: 3, isElective: false },
+                    { name: "مبادئ الإحصاء", hours: 2, isElective: false },
+                    { name: "إدارة المشروعات", hours: 2, isElective: true, group: "cs_t2g1", id: "cs_proj_mgmt" },
+                    { name: "الكمبيوتر المايكرو وتطبيقاته", hours: 2, isElective: true, group: "cs_t2g1", id: "cs_micro_computer" },
+                    { name: "تاريخ وفلسفة العلوم", hours: 2, isElective: true, group: "cs_t2g2", id: "cs_history_sci" },
+                    { name: "حقوق الانسان ومكافحة الفساد", hours: 2, isElective: true, group: "cs_t2g2", id: "cs_human_rights" }
+                ]
+            }
+        },
+        chem: {
+            1: {
+                t1: [
+                    { name: "لغة إنجليزية", hours: 2, isElective: false },
+                    { name: "مقدمة في الحاسب", hours: 2, isElective: false },
+                    { name: "كيمياء غير عضوية وفيزيائية", hours: 3, isElective: false },
+                    { name: "فيزياء عامة 1", hours: 3, isElective: false },
+                    { name: "تفاضل وتكامل 1", hours: 3, isElective: false },
+                    { name: "كيمياء عضوية وحيوية", hours: 2, isElective: false },
+                    { name: "مبادئ إدارة", hours: 2, isElective: true, group: "chem_g1", id: "chem_admin" },
+                    { name: "ثقافة بيئية", hours: 2, isElective: true, group: "chem_g1", id: "chem_env" }
+                ],
+                t2: [
+                    { name: "التفكير العلمي والكتابة العلمية", hours: 2, isElective: false },
+                    { name: "مبادئ برمجة", hours: 2, isElective: false },
+                    { name: "أساسيات علم الحيوان 1 (فسيولوجي وأنسجة)", hours: 3, isElective: false },
+                    { name: "نبات عام", hours: 3, isElective: false },
+                    { name: "جيولوجيا عامة 1", hours: 3, isElective: false },
+                    { name: "كيمياء تحليلية وفيزيائية", hours: 2, isElective: false },
+                    { name: "تاريخ وفلسفة العلوم", hours: 2, isElective: true, group: "chem_t2g1", id: "chem_history_sci" },
+                    { name: "حقوق الانسان ومكافحة الفساد", hours: 2, isElective: true, group: "chem_t2g1", id: "chem_human_rights" }
+                ]
+            }
+        },
+        chem_biochem: {
+            1: {
+                t1: [
+                    { name: "لغة إنجليزية", hours: 2, isElective: false },
+                    { name: "مقدمة في الحاسب", hours: 2, isElective: false },
+                    { name: "كيمياء غير عضوية وفيزيائية", hours: 3, isElective: false },
+                    { name: "فيزياء عامة 1", hours: 3, isElective: false },
+                    { name: "تفاضل وتكامل 1", hours: 3, isElective: false },
+                    { name: "كيمياء عضوية وحيوية", hours: 2, isElective: false },
+                    { name: "مبادئ إدارة", hours: 2, isElective: true, group: "cb_g1", id: "cb_admin" },
+                    { name: "ثقافة بيئية", hours: 2, isElective: true, group: "cb_g1", id: "cb_env" }
+                ],
+                t2: [
+                    { name: "التفكير العلمي والكتابة العلمية", hours: 2, isElective: false },
+                    { name: "مبادئ برمجة", hours: 2, isElective: false },
+                    { name: "أساسيات علم الحيوان 1 (فسيولوجي وأنسجة)", hours: 3, isElective: false },
+                    { name: "نبات عام", hours: 3, isElective: false },
+                    { name: "جيولوجيا عامة 1", hours: 3, isElective: false },
+                    { name: "الأمان الحيوي", hours: 2, isElective: true, group: "cb_t2g1", id: "cb_biosafety" },
+                    { name: "معايير المختبرات الحيوية", hours: 2, isElective: true, group: "cb_t2g1", id: "cb_lab_standards" },
+                    { name: "تاريخ وفلسفة العلوم", hours: 2, isElective: true, group: "cb_t2g2", id: "cb_history_sci" },
+                    { name: "حقوق الانسان ومكافحة الفساد", hours: 2, isElective: true, group: "cb_t2g2", id: "cb_human_rights" }
+                ]
+            }
+        },
+        micro_chem: {
+            1: {
+                t1: [
+                    { name: "لغة إنجليزية", hours: 2, isElective: false },
+                    { name: "نبات عام", hours: 3, isElective: false },
+                    { name: "كيمياء غير عضوية وفيزيائية", hours: 3, isElective: false },
+                    { name: "فيزياء عامة 1", hours: 3, isElective: false },
+                    { name: "تفاضل وتكامل 1", hours: 3, isElective: false },
+                    { name: "كيمياء عضوية وحيوية", hours: 2, isElective: false },
+                    { name: "مبادئ إدارة", hours: 2, isElective: true, group: "mc_g1", id: "mc_admin" },
+                    { name: "ثقافة بيئية", hours: 2, isElective: true, group: "mc_g1", id: "mc_env" }
+                ],
+                t2: [
+                    { name: "التفكير العلمي والكتابة العلمية", hours: 2, isElective: false },
+                    { name: "مقدمة في الحاسب", hours: 2, isElective: false },
+                    { name: "أساسيات علم الحيوان 1 (فسيولوجي وأنسجة)", hours: 3, isElective: false },
+                    { name: "مقدمة في التقسيم والميكروبيولوجي", hours: 2, isElective: false },
+                    { name: "جيولوجيا عامة 1", hours: 3, isElective: false },
+                    { name: "مبادئ علم الخلية والوراثة الميكروبية", hours: 2, isElective: true, group: "mc_t2g1", id: "mc_cell_genetics" },
+                    { name: "مهارات معملية", hours: 2, isElective: true, group: "mc_t2g1", id: "mc_lab_skills" },
+                    { name: "تاريخ وفلسفة العلوم", hours: 2, isElective: true, group: "mc_t2g2", id: "mc_history_sci" },
+                    { name: "حقوق الانسان ومكافحة الفساد", hours: 2, isElective: true, group: "mc_t2g2", id: "mc_human_rights" }
+                ]
+            }
+        },
+        botany_chem: {
+            1: {
+                t1: [
+                    { name: "لغة إنجليزية", hours: 2, isElective: false },
+                    { name: "نبات عام", hours: 3, isElective: false },
+                    { name: "كيمياء غير عضوية وفيزيائية", hours: 3, isElective: false },
+                    { name: "فيزياء عامة 1", hours: 3, isElective: false },
+                    { name: "تفاضل وتكامل 1", hours: 3, isElective: false },
+                    { name: "كيمياء عضوية وحيوية", hours: 2, isElective: false },
+                    { name: "مبادئ إدارة", hours: 2, isElective: true, group: "bc_g1", id: "bc_admin" },
+                    { name: "ثقافة بيئية", hours: 2, isElective: true, group: "bc_g1", id: "bc_env" }
+                ],
+                t2: [
+                    { name: "التفكير العلمي والكتابة العلمية", hours: 2, isElective: false },
+                    { name: "مقدمة في الحاسب", hours: 2, isElective: false },
+                    { name: "أساسيات علم الحيوان 1 (فسيولوجي وأنسجة)", hours: 3, isElective: false },
+                    { name: "مقدمة في التقسيم والميكروبيولوجي", hours: 2, isElective: false },
+                    { name: "جيولوجيا عامة 1", hours: 3, isElective: false },
+                    { name: "علم المحاصيل", hours: 2, isElective: true, group: "bc_t2g1", id: "bc_crop_science" },
+                    { name: "علم النبات التطبيقي", hours: 2, isElective: true, group: "bc_t2g1", id: "bc_applied_botany" },
+                    { name: "تاريخ وفلسفة العلوم", hours: 2, isElective: true, group: "bc_t2g2", id: "bc_history_sci" },
+                    { name: "حقوق الانسان ومكافحة الفساد", hours: 2, isElective: true, group: "bc_t2g2", id: "bc_human_rights" }
+                ]
+            }
+        },
+        math: {
+            1: {
+                t1: [
+                    { name: "لغة إنجليزية", hours: 2, isElective: false },
+                    { name: "مقدمة في الحاسب", hours: 2, isElective: false },
+                    { name: "كيمياء غير عضوية وفيزيائية", hours: 3, isElective: false },
+                    { name: "فيزياء عامة 1", hours: 3, isElective: false },
+                    { name: "تفاضل وتكامل 1", hours: 3, isElective: false },
+                    { name: "أساسيات الرياضيات البحتة والتطبيقية", hours: 2, isElective: true, group: "math_g1", id: "math_pure_math" },
+                    { name: "رياضيات اكتوارية", hours: 2, isElective: true, group: "math_g1", id: "math_actuarial" },
+                    { name: "مبادئ إدارة", hours: 2, isElective: true, group: "math_g2", id: "math_admin" },
+                    { name: "ثقافة بيئية", hours: 2, isElective: true, group: "math_g2", id: "math_env" }
+                ],
+                t2: [
+                    { name: "التفكير العلمي والكتابة العلمية", hours: 2, isElective: false },
+                    { name: "مبادئ برمجة", hours: 2, isElective: false },
+                    { name: "تفاضل وتكامل 2", hours: 2, isElective: false },
+                    { name: "ميكانيكا نيوتينية 1", hours: 2, isElective: false },
+                    { name: "جبر", hours: 3, isElective: false },
+                    { name: "مبادئ الإحصاء", hours: 2, isElective: false },
+                    { name: "هندسة فراغية", hours: 2, isElective: true, group: "math_t2g1", id: "math_spatial_geom" },
+                    { name: "هندسة إقليدية وغير إقليدية", hours: 2, isElective: true, group: "math_t2g1", id: "math_euclid_geom" },
+                    { name: "تاريخ وفلسفة العلوم", hours: 2, isElective: true, group: "math_t2g2", id: "math_history_sci" },
+                    { name: "حقوق الانسان ومكافحة الفساد", hours: 2, isElective: true, group: "math_t2g2", id: "math_human_rights" }
+                ]
+            }
+        },
+        math_physics: {
+            1: {
+                t1: [
+                    { name: "لغة إنجليزية", hours: 2, isElective: false },
+                    { name: "مقدمة في الحاسب", hours: 2, isElective: false },
+                    { name: "كيمياء غير عضوية وفيزيائية", hours: 3, isElective: false },
+                    { name: "فيزياء عامة 1", hours: 3, isElective: false },
+                    { name: "تفاضل وتكامل 1", hours: 3, isElective: false },
+                    { name: "كهربية ومغناطيسية", hours: 2, isElective: true, group: "mp_g1", id: "mp_elec_mag" },
+                    { name: "فيزياء بيئية", hours: 2, isElective: true, group: "mp_g1", id: "mp_env_physics" },
+                    { name: "مبادئ إدارة", hours: 2, isElective: true, group: "mp_g2", id: "mp_admin" },
+                    { name: "ثقافة بيئية", hours: 2, isElective: true, group: "mp_g2", id: "mp_env" }
+                ],
+                t2: [
+                    { name: "التفكير العلمي والكتابة العلمية", hours: 2, isElective: false },
+                    { name: "مبادئ برمجة", hours: 2, isElective: false },
+                    { name: "تفاضل وتكامل 2", hours: 2, isElective: false },
+                    { name: "جبر", hours: 2, isElective: false },
+                    { name: "ميكانيكا كلاسيكية", hours: 2, isElective: false },
+                    { name: "ديناميكا حرارية", hours: 2, isElective: false },
+                    { name: "ميكانيكا نيوتينية 1", hours: 2, isElective: true, group: "mp_t2g1", id: "mp_newtonian_mech" },
+                    { name: "مبادئ الاحصاء", hours: 2, isElective: true, group: "mp_t2g1", id: "mp_stats" },
+                    { name: "تاريخ وفلسفة العلوم", hours: 2, isElective: true, group: "mp_t2g2", id: "mp_history_sci" },
+                    { name: "حقوق الانسان ومكافحة الفساد", hours: 2, isElective: true, group: "mp_t2g2", id: "mp_human_rights" }
+                ]
+            }
+        },
+        physics_chem: {
+            1: {
+                t1: [
+                    { name: "لغة إنجليزية", hours: 2, isElective: false },
+                    { name: "مقدمة في الحاسب", hours: 2, isElective: false },
+                    { name: "كيمياء غير عضوية وفيزيائية", hours: 3, isElective: false },
+                    { name: "فيزياء عامة 1", hours: 3, isElective: false },
+                    { name: "تفاضل وتكامل 1", hours: 3, isElective: false },
+                    { name: "كيمياء عضوية وحيوية", hours: 2, isElective: false },
+                    { name: "مبادئ إدارة", hours: 2, isElective: true, group: "pc_g1", id: "pc_admin" },
+                    { name: "ثقافة بيئية", hours: 2, isElective: true, group: "pc_g1", id: "pc_env" }
+                ],
+                t2: [
+                    { name: "التفكير العلمي والكتابة العلمية", hours: 2, isElective: false },
+                    { name: "مبادئ برمجة", hours: 2, isElective: false },
+                    { name: "أساسيات علم الحيوان 1 (فسيولوجي وأنسجة)", hours: 3, isElective: false },
+                    { name: "نبات عام", hours: 3, isElective: false },
+                    { name: "جيولوجيا عامة 1", hours: 3, isElective: false },
+                    { name: "كلاسيكية 1", hours: 2, isElective: true, group: "pc_t2g1", id: "pc_classical1" },
+                    { name: "كهربية ومغناطيسية", hours: 2, isElective: true, group: "pc_t2g1", id: "pc_elec_mag" },
+                    { name: "تاريخ وفلسفة العلوم", hours: 2, isElective: true, group: "pc_t2g2", id: "pc_history_sci" },
+                    { name: "حقوق الانسان ومكافحة الفساد", hours: 2, isElective: true, group: "pc_t2g2", id: "pc_human_rights" }
+                ]
+            }
+        },
+        geo_chem: {
+            1: {
+                t1: [
+                    { name: "لغة إنجليزية", hours: 2, isElective: false },
+                    { name: "مقدمة في الحاسب", hours: 2, isElective: false },
+                    { name: "كيمياء غير عضوية وفيزيائية", hours: 3, isElective: false },
+                    { name: "فيزياء عامة 1", hours: 3, isElective: false },
+                    { name: "تفاضل وتكامل 1", hours: 3, isElective: false },
+                    { name: "معادن وبلورات", hours: 2, isElective: false },
+                    { name: "مبادئ إدارة", hours: 2, isElective: true, group: "gc_g1", id: "gc_admin" },
+                    { name: "ثقافة بيئية", hours: 2, isElective: true, group: "gc_g1", id: "gc_env" }
+                ],
+                t2: [
+                    { name: "التفكير العلمي والكتابة العلمية", hours: 2, isElective: false },
+                    { name: "مبادئ برمجة", hours: 2, isElective: false },
+                    { name: "أساسيات علم الحيوان 1 (فسيولوجي وأنسجة)", hours: 3, isElective: false },
+                    { name: "نبات عام", hours: 3, isElective: false },
+                    { name: "جيولوجيا عامة 1", hours: 3, isElective: false },
+                    { name: "كيمياء عضوية وحيوية", hours: 2, isElective: false },
+                    { name: "تاريخ وفلسفة العلوم", hours: 2, isElective: true, group: "gc_t2g1", id: "gc_history_sci" },
+                    { name: "حقوق الانسان ومكافحة الفساد", hours: 2, isElective: true, group: "gc_t2g1", id: "gc_human_rights" }
+                ]
+            }
+        },
         zoo_chem: {
             1: {
                 t1: [
@@ -425,7 +653,7 @@
                 t2: [
                     { name: "التفكير العلمي والكتابة العلمية", hours: 2, isElective: false },
                     { name: "مبادئ برمجة", hours: 2, isElective: false },
-                    { name: "أساسيات علم الحيوان (فسيولوجي وأنسجة)", hours: 3, isElective: false },
+                    { name: "أساسيات علم الحيوان 1 (فسيولوجي وأنسجة)", hours: 3, isElective: false },
                     { name: "نبات عام", hours: 3, isElective: false },
                     { name: "جيولوجيا عامة 1", hours: 3, isElective: false },
                     { name: "تاريخ وفلسفة العلوم", hours: 2, isElective: true, group: "zc_t2g1", id: "zc_history_sci" },
