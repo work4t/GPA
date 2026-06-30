@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حساب GPA الكلية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+    :root { 
+        --primary: #2c3e50; 
+        --accent: #3498db; 
+        --bg-color: #f4f7f6;
+        --text-color: #333;
+        --danger: #e74c3c;
+    }
+    
+    body { 
+        font-family: 'Cairo', Tahoma, sans-serif; 
+        background-color: var(--bg-color); 
+        padding: 15px; 
+        display: flex; 
+        justify-content: center; 
+        color: var(--text-color);
+    }
+    
+    .container { 
+        background: white; 
+        padding: 25px; 
+        border-radius: 16px; 
+        box-shadow: 0 12px 30px rgba(0,0,0,0.08); 
+        max-width: 850px; 
+        width: 100%; 
+        box-sizing: border-box;
+    }
+    
+    h2 { 
+        text-align: center; 
+        color: var(--primary); 
+        border-bottom: 3px solid var(--accent); 
+        padding-bottom: 12px; 
+        font-weight: 800;
+        margin-top: 0;
+        font-size: 22px;
+    }
+    
+    .selector-group { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 20px; 
+        margin-bottom: 25px; 
+    }
+    
+    .selector-field { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 8px; 
+    }
+    
+    label { 
+        font-weight: 700; 
+        color: var(--primary); 
+        font-size: 15px;
+    }
+    
+    select { 
+        padding: 12px 15px; 
+        border-radius: 10px; 
+        border: 2px solid #e0e0e0; 
+        font-size: 15px; 
+        font-family: inherit; 
+        font-weight: 600;
+        outline: none; 
+        background-color: #fafafa;
+        color: #444;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232c3e50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: left 15px center;
+        background-size: 18px;
+    }
+    
+    select:focus { 
+        border-color: var(--accent); 
+        background-color: #fff;
+        box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.15);
+    }
+    
+    .radio-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 5px;
+    }
+    
+    .radio-card {
+        flex: 1;
+        min-width: 130px;
+        position: relative;
+    }
+    
+    .radio-card input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .radio-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 12px;
+        background: #f8f9fa;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 14px;
+        transition: all 0.25s ease;
+        text-align: center;
+    }
+    
+    .radio-label::before {
+        content: "";
+        width: 12px;
+        height: 12px;
+        border: 2px solid #b0b0b0;
+        border-radius: 50%;
+        display: inline-block;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+    
+    .radio-card input[type="radio"]:checked + .radio-label {
+        background-color: #e8f4fd;
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+    
+    .radio-card input[type="radio"]:checked + .radio-label::before {
+        border-color: var(--accent);
+        background-color: var(--accent);
+        box-shadow: inset 0 0 0 2px #fff;
+    }
+
+    .hidden { display: none !important; }
+    
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+        margin-top: 20px;
+        border-radius: 8px;
+        border: 1px solid #eee;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    table { 
+        width: 100%; 
+        border-collapse: collapse; 
+        min-width: 500px;
+    }
+    
+    th, td { 
+        padding: 12px 10px; 
+        text-align: right; 
+        border-bottom: 1px solid #eee; 
+        font-size: 14px;
+        font-weight: 600;
+    }
+    
+    th { 
+        background-color: var(--primary); 
+        color: white; 
+        font-weight: 700; 
+        vertical-align: middle;
+    }
+    
+    tr:last-child td { border-bottom: none; }
+    tr:hover { background-color: #fcfdfe; }
+    
+    .course-row {
+        transition: all 0.3s ease;
+    }
+    
+    .course-row.disabled-course {
+        opacity: 0.4;
+    }
+    
+    .course-row.disabled-course input[type="number"] {
+        background-color: #e0e0e0;
+        pointer-events: none;
+    }
+    
+    input[type="number"] { 
+        width: 75px; 
+        padding: 8px; 
+        border: 2px solid #e0e0e0; 
+        border-radius: 6px; 
+        text-align: center; 
+        font-family: inherit;
+        font-weight: 700;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.2s;
+        box-sizing: border-box;
+    }
+    input[type="number"]:focus { border-color: var(--accent); }
+    
+    /* إخفاء الراديو الأصلي واستبداله بعلامة صح مخصصة */
+    .elective-radio {
+        display: none;
+    }
+
+    .elective-check-label {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 19px;
+        height: 19px;
+        border-radius: 50%;
+        border: 2px solid #ccc;
+        background: #f5f5f5;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        user-select: none;
+    }
+
+    /* عند الاختيار: تتحول لصح زرقاء مثل المواد الأساسية */
+    .elective-radio:checked + .elective-check-label {
+        background-color: var(--accent);
+        border-color: var(--accent);
+    }
+
+    .elective-radio:checked + .elective-check-label svg {
+        stroke: #fff !important;
+    }
+
+    .elective-check-label svg {
+        width: 11px;
+        height: 11px;
+        stroke: transparent;
+        stroke-width: 3;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        transition: stroke 0.2s ease;
+    }
+
+    .elective-radio:checked + .elective-check-label {
+        background-color: var(--accent);
+        border-color: var(--accent);
+    }
+
+    .elective-radio:checked + .elective-check-label svg {
+        stroke: #fff;
+    }
+
+    /* علامة الصح الزرقاء للمواد الأساسية (الإلزامية) - غير قابلة للإزالة */
+    .required-check {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background-color: var(--accent);
+        color: #fff;
+    }
+    .required-check svg {
+        width: 14px;
+        height: 14px;
+        stroke: #fff;
+        stroke-width: 3;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    
+    .btn-calc { 
+        display: block; 
+        width: 100%; 
+        padding: 15px; 
+        margin-top: 25px; 
+        background-color: var(--accent); 
+        color: white; 
+        border: none; 
+        border-radius: 10px; 
+        font-size: 18px; 
+        font-weight: 700;
+        font-family: inherit;
+        cursor: pointer; 
+        transition: background-color 0.2s, transform 0.1s;
+    }
+    .btn-calc:hover { background-color: #2980b9; }
+    .btn-calc:active { transform: scale(0.99); }
+    
+    #result-box { margin-top: 25px; padding: 20px; border-radius: 10px; text-align: center; display: none; background-color: #e8f4fd; border: 1px solid #d4ebfc; }
+    #result-box h3 { border: none; padding: 0; margin-bottom: 5px; justify-content: center; display: flex;}
+    .gpa-value { font-size: 36px; font-weight: 800; color: #2ecc71; }
+
+    /* لون نقاط GPA لكل مادة في الجدول - أزرق فاتح كباقي الموقع */
+    .row-points {
+        color: var(--accent);
+        font-weight: 800;
+    }
+    
+    .placeholder-msg { 
+        text-align: center; 
+        color: #e67e22; 
+        font-weight: 700; 
+        margin-top: 25px; 
+        padding: 15px; 
+        background: #fdf5e6; 
+        border-radius: 10px; 
+        border: 1px dashed #f39c12;
+        font-size: 14px;
+    }
+
+    /* صندوق الأخطاء الجديد والاحترافي */
+    #error-box {
+        margin-top: 15px;
+        padding: 12px;
+        background-color: #fde8e8;
+        border: 1px solid #f7b7b7;
+        color: var(--danger);
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 14px;
+        text-align: center;
+        display: none;
+    }
+</style>
+
+</head>
+<body>
+
+<div class="container">
+    <h2> Faculty of Science Beni Suef University GPA Calculator </h2>
+
+<div class="selector-group">
+    <div class="selector-field">
+        <label for="department">اختر القسم:</label>
+        <select id="department" onchange="handleDepartmentChange()">
+            <option value="" selected disabled>-- اختر القسم --</option>
+            <option value="cs">علوم الحاسب</option>
+            <option value="physics">فيزياء</option>
+            <option value="math_physics">رياضيات وفيزياء</option>
+            <option value="math">رياضيات</option>
+            <option value="stats">إحصاء</option>
+            <option value="biochem">كيمياء حيوي</option>
+            <option value="chem_biochem">كيمياء وكيمياء حيوية</option>
+            <option value="micro_chem">ميكروبيولوجي وكيمياء</option>
+            <option value="zoo_chem">حيوان وكيمياء</option>
+            <option value="entom_chem">حشرات وكيمياء</option>
+            <option value="botany_chem">النبات والكيمياء</option>
+            <option value="botany_micro">نبات وميكروبيولجي</option>
+            <option value="physics_chem">الفيزياء والكيمياء</option>
+            <option value="geo_chem">جيولوجيا وكيمياء</option>
+            <option value="geo">الجيولوجيا</option>
+            <option value="chem">الكيمياء</option>
+            <option value="ind_chem">كيمياء صناعية (خاص)</option>
+            <option value="micro_biochem">ميكروبيولوجي وكيمياء حيوية (خاص)</option>
+            <option value="petro">بترول وتعدين (خاص)</option>
+        </select>
+    </div>
+
+    <div class="selector-field hidden" id="year-wrapper">
+        <label for="year">اختر السنة الدراسية:</label>
+        <select id="year" onchange="handleYearChange()">
+            <option value="" selected disabled>-- اختر السنة --</option>
+            <option value="1">الأولى</option>
+            <option value="2">الثانية</option>
+            <option value="3">الثالثة</option>
+            <option value="4">الرابعة</option>
+        </select>
+    </div>
+
+    <div class="selector-field hidden" id="term-wrapper">
+        <label>حساب الـ GPA الخاص بـ :</label>
+        <div class="radio-group">
+            <div class="radio-card">
+                <input type="radio" id="t1" name="term-select" value="t1" onchange="handleTermChange()">
+                <label for="t1" class="radio-label">الترم الأول</label>
+            </div>
+            <div class="radio-card">
+                <input type="radio" id="t2" name="term-select" value="t2" onchange="handleTermChange()">
+                <label for="t2" class="radio-label">الترم الثاني</label>
+            </div>
+            <div class="radio-card">
+                <input type="radio" id="total" name="term-select" value="total" onchange="handleTermChange()">
+                <label for="total" class="radio-label">المعدل التراكمي العام</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="placeholder-message" class="placeholder-msg hidden">جاري العمل على إضافة المواد الخاصة بهذا الخيار حالياً...</div>
+
+<div id="dynamic-table-wrapper" class="hidden">
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>اختر</th>
+                    <th>المادة</th>
+                    <th>الساعات</th>
+                    <th>درجتك من 100</th>
+                    <th>GPA المادة</th>
+                </tr>
+            </thead>
+            <tbody id="subjects-body">
+                </tbody>
+        </table>
+    </div>
+
+    <div id="error-box"></div>
+
+    <button class="btn-calc" onclick="calculateGPA()">احسب الـ GPA</button>
+
+    <div id="result-box">
+        <h3>معدلك الفصلي النهائي:</h3>
+        <div class="gpa-value" id="gpa-display">0.00</div>
+    </div>
+</div>
+
+</div>
+
+<script>
+    // 1. قاعدة البيانات (Data Structure) لجميع الأقسام والمواد
+    const coursesData = {
+        physics: {
+            1: {
+                t1: [
+                    { name: "فيزياء عامة 1", hours: 3, isElective: false },
+                    { name: "لغة إنجليزية", hours: 2, isElective: false },
+                    { name: "مقدمة في الحاسب", hours: 2, isElective: false },
+                    { name: "تفاضل وتكامل 1", hours: 3, isElective: false },
+                    { name: "كيمياء غير عضوية وفيزيائية", hours: 3, isElective: false },
+                    // كهربية ومغناطيسية وفيزياء بيئية أصبحا مادتين اختياريتين، يتم اختيار واحدة منهما فقط
+                    { name: "كهربية ومغناطيسية", hours: 2, isElective: true, group: "g2", id: "elec_mag" },
+                    { name: "فيزياء بيئية", hours: 2, isElective: true, group: "g2", id: "env_physics" },
+                    // المواد الاختيارية تأخذ نفس رقم المجموعة group لتسهيل الربط والتبديل بينها
+                    { name: "ثقافة بيئية", hours: 2, isElective: true, group: "g1", id: "env" },
+                    { name: "مبادئ إدارة", hours: 2, isElective: true, group: "g1", id: "admin" }
+                ],
+                t2: [
+                    { name: "فيزياء رياضية 1", hours: 2, isElective: false },
+                    { name: "ميكانيكا كلاسيكية 1", hours: 2, isElective: false },
+                    { name: "ديناميكا حرارية", hours: 2, isElective: false },
+                    { name: "عملي فيزياء", hours: 2, isElective: false },
+                    { name: "مبادئ برمجة", hours: 2, isElective: false },
+                    { name: "التفكير العلمي والكتابة العلمية", hours: 2, isElective: false },
+                    { name: "تفاضل وتكامل 2", hours: 2, isElective: false },
+                    // المجموعة الأولى: بصريات هندسية أو فيزياء حديثة
+                    { name: "بصريات هندسية", hours: 2, isElective: true, group: "t2g1", id: "geo_optics" },
+                    { name: "فيزياء حديثة", hours: 2, isElective: true, group: "t2g1", id: "modern_phys" },
+                    // المجموعة الثانية: تاريخ وفلسفة العلوم أو حقوق الانسان ومكافحة الفساد
+                    { name: "تاريخ وفلسفة العلوم", hours: 2, isElective: true, group: "t2g2", id: "history_sci" },
+                    { name: "حقوق الانسان ومكافحة الفساد", hours: 2, isElective: true, group: "t2g2", id: "human_rights" }
+                ]
+            }
+            // هنا تقدر تضيف السنين والترمات الباقية لقسم الفيزياء أو أي قسم آخر بنفس الطريقة بسهولة جداً
+        },
+        zoo_chem: {
+            1: {
+                t1: [
+                    { name: "لغة إنجليزية", hours: 2, isElective: false },
+                    { name: "مقدمة في الحاسب", hours: 2, isElective: false },
+                    { name: "كيمياء غير عضوية وفيزيائية", hours: 3, isElective: false },
+                    { name: "فيزياء عامة 1", hours: 3, isElective: false },
+                    { name: "تفاضل وتكامل 1", hours: 3, isElective: false },
+                    // اختياري: مبادئ إدارة أو ثقافة بيئية
+                    { name: "مبادئ إدارة", hours: 2, isElective: true, group: "g1", id: "zc_admin" },
+                    { name: "ثقافة بيئية", hours: 2, isElective: true, group: "g1", id: "zc_env" }
+                ],
+                t2: [
+                    { name: "التفكير العلمي والكتابة العلمية", hours: 2, isElective: false },
+                    { name: "مقدمة في الحاسب", hours: 2, isElective: false },
+                    { name: "أساسيات علم الحيوان (فسيولوجي وأنسجة)", hours: 3, isElective: false },
+                    { name: "نبات عام", hours: 3, isElective: false },
+                    { name: "جيولوجيا عامة 1", hours: 3, isElective: false },
+                    // اختياري 1: تاريخ وفلسفة العلوم أو حقوق انسان ومكافحة الفساد
+                    { name: "تاريخ وفلسفة العلوم", hours: 2, isElective: true, group: "zc_t2g1", id: "zc_history_sci" },
+                    { name: "حقوق انسان ومكافحة الفساد", hours: 2, isElective: true, group: "zc_t2g1", id: "zc_human_rights" },
+                    // اختياري 2: أساسيات علم البيئة أو بيئة صحراوية
+                    { name: "أساسيات علم البيئة", hours: 2, isElective: true, group: "zc_t2g2", id: "zc_ecology" },
+                    { name: "بيئة صحراوية", hours: 2, isElective: true, group: "zc_t2g2", id: "zc_desert" }
+                ]
+            }
+        }
+    };
+
+    // أيقونة الصح الزرقاء الثابتة للمواد الأساسية (الإلزامية) - غير قابلة للإزالة من المستخدم
+    const REQUIRED_CHECK_HTML = `<span class="required-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>`;
+
+    function handleDepartmentChange() {
+        document.getElementById('year-wrapper').classList.remove('hidden');
+        resetBelow('department');
+    }
+
+    function handleYearChange() {
+        document.getElementById('term-wrapper').classList.remove('hidden');
+        resetBelow('year');
+    }
+
+    // 2. دالة بناء صفوف الجدول (مستخرجة عشان تتشارك بين الترمات والتراكمي)
+    function buildRows(tbody, subjects, allSubjects) {
+        subjects.forEach(subject => {
+            const tr = document.createElement('tr');
+            tr.className = 'course-row';
+            tr.setAttribute('data-hours', subject.hours);
+
+            if (subject.isElective) {
+                tr.id = `row-${subject.id}`;
+                tr.setAttribute('data-group', subject.group);
+                const targetId = allSubjects.find(s => s.isElective && s.group === subject.group && s.id !== subject.id).id;
+                tr.setAttribute('data-target', targetId);
+            }
+
+            const targetId = subject.isElective ? tr.getAttribute('data-target') : '';
+            tr.innerHTML = `
+                <td>${subject.isElective
+                    ? `<input type="radio" name="elective-${subject.group}" id="radio-${subject.id}" class="elective-radio" onchange="toggleElective('${subject.id}', '${targetId}')"><label for="radio-${subject.id}" class="elective-check-label"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></label>`
+                    : REQUIRED_CHECK_HTML}</td>
+                <td>${subject.name}</td>
+                <td>${subject.hours}</td>
+                <td><input type="number" class="score" oninput="updateRowPoints(this)" min="0" max="100"></td>
+                <td class="row-points">-</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function addSeparatorRow(tbody, label) {
+        const tr = document.createElement('tr');
+        tr.className = 'separator-row';
+        tr.innerHTML = `<td colspan="5" style="background:#eaf4fb; color:var(--accent); font-weight:800; text-align:center; padding:9px; font-size:14px; letter-spacing:0.5px;">${label}</td>`;
+        tbody.appendChild(tr);
+    }
+
+    // 3. دالة توليد الجدول برمجياً بناءً على اختيار المستخدم
+    function handleTermChange() {
+        const dept = document.getElementById('department').value;
+        const year = document.getElementById('year').value;
+        const selectedRadio = document.querySelector('input[name="term-select"]:checked');
+        const term = selectedRadio ? selectedRadio.value : '';
+
+        const tableWrapper = document.getElementById('dynamic-table-wrapper');
+        const placeholder = document.getElementById('placeholder-message');
+        const tbody = document.getElementById('subjects-body');
+        
+        tbody.innerHTML = '';
+        document.getElementById('result-box').style.display = 'none';
+        showError("");
+
+        const baseData = coursesData[dept] && coursesData[dept][year];
+
+        if (term === 'total') {
+            // المعدل التراكمي: دمج مواد الترمين في جدول واحد
+            const t1 = baseData && coursesData[dept][year]['t1'];
+            const t2 = baseData && coursesData[dept][year]['t2'];
+            if (t1 && t2) {
+                const allSubjects = [...t1, ...t2];
+                addSeparatorRow(tbody, 'الترم الأول');
+                buildRows(tbody, t1, allSubjects);
+                addSeparatorRow(tbody, 'الترم الثاني');
+                buildRows(tbody, t2, allSubjects);
+                tableWrapper.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            } else {
+                tableWrapper.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+            }
+        } else if (baseData && coursesData[dept][year][term]) {
+            const subjects = coursesData[dept][year][term];
+            buildRows(tbody, subjects, subjects);
+            tableWrapper.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+        } else {
+            tableWrapper.classList.add('hidden');
+            placeholder.classList.remove('hidden');
+        }
+    }
+
+    function toggleElective(selectedId, targetId) {
+        document.getElementById('row-' + selectedId).classList.remove('disabled-course');
+        
+        const targetRow = document.getElementById('row-' + targetId);
+        targetRow.classList.add('disabled-course');
+        
+        const targetInput = targetRow.querySelector('.score');
+        targetInput.value = '';
+        targetRow.querySelector('.row-points').innerText = '-';
+        showError(""); 
+    }
+
+    function resetBelow(stage) {
+        document.getElementById('dynamic-table-wrapper').classList.add('hidden');
+        document.getElementById('placeholder-message').classList.add('hidden');
+        showError("");
+        
+        if (stage === 'department') {
+            document.getElementById('year').selectedIndex = 0;
+            document.getElementById('term-wrapper').classList.add('hidden');
+            uncheckRadios();
+        } else if (stage === 'year') {
+            uncheckRadios();
+        }
+    }
+
+    function uncheckRadios() {
+        const radios = document.querySelectorAll('input[name="term-select"]');
+        radios.forEach(radio => radio.checked = false);
+    }
+
+    function getPrecisePoints(score) {
+        if (score < 60) return 0; 
+        let points = (score - 50) / 10; 
+        return Math.min(5.0, Math.max(0, points)); 
+    }
+
+    function updateRowPoints(input) {
+        let score = parseFloat(input.value);
+        showError(""); 
+
+        if (score > 100) { input.value = 100; score = 100; }
+        if (score < 0) { input.value = 0; score = 0; }
+
+        let pointsTd = input.parentElement.nextElementSibling;
+        if (!isNaN(score)) {
+            const pts = getPrecisePoints(score);
+            pointsTd.innerText = parseFloat(pts.toFixed(2));
+        } else {
+            pointsTd.innerText = "-";
+        }
+    }
+
+    // 3. دالة إظهار وإخفاء صندوق الأخطاء الاحترافي بديل الـ Alert
+    function showError(msg) {
+        const errorBox = document.getElementById('error-box');
+        if(msg) {
+            errorBox.textContent = msg;
+            errorBox.style.display = 'block';
+        } else {
+            errorBox.style.display = 'none';
+        }
+    }
+
+    function calculateGPA() {
+        const rows = document.querySelectorAll('#subjects-body tr');
+        let totalWeight = 0;
+        let totalHours = 0;
+        let ready = true;
+        
+        // فحص المواد الاختيارية ديناميكياً
+        const electiveRows = document.querySelectorAll('.course-row[data-group]');
+        if (electiveRows.length > 0) {
+            // نأخذ المجموعات المتوفرة بالجدول بشكل فريد
+            const groups = [...new Set(Array.from(electiveRows).map(r => r.getAttribute('data-group')))];
+            for (let g of groups) {
+                const checked = document.querySelector(`input[name="elective-${g}"]:checked`);
+                if (!checked) {
+                    showError("من فضلك اختر مادة اختيارية واحدة أولاً من الجدول!");
+                    return;
+                }
+            }
+        }
+
+        rows.forEach(row => {
+            if (row.classList.contains('disabled-course')) return;
+            if (row.classList.contains('separator-row')) return;
+
+            const hours = parseFloat(row.getAttribute('data-hours'));
+            const scoreInput = row.querySelector('.score');
+            
+            if (!scoreInput || scoreInput.value === "") { ready = false; return; }
+
+            const points = getPrecisePoints(parseFloat(scoreInput.value));
+            totalWeight += (points * hours);
+            totalHours += hours;
+        });
+
+        if (!ready) { 
+            showError("من فضلك أدخل كل درجات المواد المفعلة أولاً."); 
+            return; 
+        }
+
+        showError(""); // مسح أي خطأ في حال الحساب الناجح
+        const gpa = totalWeight / totalHours;
+        document.getElementById('result-box').style.display = 'block';
+        document.getElementById('gpa-display').innerText = gpa.toFixed(3); 
+    }
+</script>
+
+</body>
+</html>
