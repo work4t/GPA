@@ -48,6 +48,7 @@ font-size: 22px;
 display: flex;
 flex-direction: column;
 gap: 20px;
+margin-top: 2px;
 margin-bottom: 25px;
 }
 .selector-field {
@@ -448,6 +449,13 @@ transition: transform 0.3s ease;
 #content-footer { margin-top: 5px; }
 
 .pdf-section { margin-top: 20px; }
+.pdf-hint-text {
+text-align: center;
+color: #000;
+font-size: 12px;
+margin: 0 0 4px 0;
+}
+body.dark-mode .pdf-hint-text { color: var(--text-color); }
 .pdf-combined {
 display: flex;
 flex-direction: row;
@@ -484,10 +492,110 @@ white-space: nowrap;
 flex-shrink: 0;
 }
 .btn-pdf:hover { background: #219150; }
+body.dark-mode .btn-pdf { background: #27ae60; }
+body.dark-mode .btn-pdf:hover { background: #27ae60; }
+
+.container { position: relative; }
+.dark-toggle-btn {
+position: absolute;
+top: 8px;
+left: 8px;
+display: flex;
+align-items: center;
+justify-content: center;
+width: 32px;
+height: 32px;
+border-radius: 50%;
+border: none;
+background: #fff;
+cursor: pointer;
+transition: all 0.25s ease;
+padding: 0;
+z-index: 10;
+}
+.dark-toggle-btn:hover { background: #f0f6fd; }
+.dark-toggle-btn svg { width: 15px; height: 15px; stroke: var(--accent); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+h2 { margin-top: 16px; margin-bottom: 16px; }
+
+body.dark-mode { --bg-color: #000000; --text-color: #e8e8e8; --primary: #235ea7; }
+body.dark-mode .container { background: #151515; box-shadow: 0 12px 30px rgba(0,0,0,0.6); }
+body.dark-mode h2 { color: #fff; }
+body.dark-mode label { color: #e8e8e8; }
+body.dark-mode .dark-toggle-btn { background: #151515; }
+body.dark-mode .dark-toggle-btn:hover { background: #1c1c1c; }
+body.dark-mode select {
+background-color: #222222;
+color: #f0f0f0;
+border-color: #404040;
+}
+body.dark-mode select:focus {
+background-color: #292929;
+border-color: var(--accent);
+box-shadow: 0 0 0 4px rgba(49, 130, 220, 0.25);
+}
+body.dark-mode .radio-label {
+background: #222222;
+border-color: #404040;
+color: #f0f0f0;
+}
+body.dark-mode .radio-card input[type="radio"]:checked + .radio-label {
+background-color: #1c3a52;
+color: #fff;
+}
+body.dark-mode .radio-card input[type="radio"]:checked + .radio-label::before {
+box-shadow: inset 0 0 0 2px #222222;
+}
+body.dark-mode .table-container { border-color: #333; }
+body.dark-mode th, body.dark-mode td { border-color: #333; }
+body.dark-mode td { color: #e8e8e8; }
+body.dark-mode tr:hover { background-color: #1f1f1f; }
+body.dark-mode .course-row.disabled-course input[type="number"] { background-color: #161616; }
+body.dark-mode input[type="number"] {
+background-color: #222222;
+color: #f0f0f0;
+border-color: #333;
+}
+body.dark-mode input[type="number"]:focus { border-color: var(--accent); }
+body.dark-mode #prev-gpa {
+background-color: #222222;
+color: #f0f0f0;
+border-color: #333;
+}
+body.dark-mode #prev-gpa:focus { border-color: var(--accent); background-color: #292929; }
+body.dark-mode .elective-check-label {
+background: #2b2b2b;
+border-color: #454545;
+}
+body.dark-mode .row-code { color: #e8e8e8; }
+body.dark-mode #result-box {
+background-color: #22282e;
+border-color: #243742;
+}
+body.dark-mode #result-box h3 { color: #e8e8e8; }
+body.dark-mode #grade-code-text { color: #fff !important; }
+body.dark-mode .grade-label-wrapper { color: #e8e8e8; }
+body.dark-mode .placeholder-msg {
+background: #2e2515;
+border-color: #6b5115;
+color: #f0b45c;
+}
+body.dark-mode #error-box {
+background-color: #361e1e;
+border-color: #822b2b;
+color: #ffe6e6;
+}
+body.dark-mode .reset-link { color: #bf3737; }
+body.dark-mode .accordion-header { background: #151515; }
+body.dark-mode .pdf-combined { background: #2b2b2b; border-color: #212121; }
+body.dark-mode .pdf-combined:focus-within { border-color: #2ecc71; }
+body.dark-mode .pdf-name-input { background: #222222; color: #f0f0f0; }
 </style>
 </head>
 <body>
 <div class="container">
+<button class="dark-toggle-btn" id="dark-toggle-btn" onclick="toggleDarkMode()" title="الوضع الليلي" type="button">
+<svg id="dark-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+</button>
 <h2> Faculty of Science Beni Suef University GPA Calculator </h2>
 <div class="selector-group">
 <div class="selector-field">
@@ -599,18 +707,40 @@ flex-shrink: 0;
 </div>
 </div>
 <div class="pdf-section hidden" id="pdf-section">
+<p class="pdf-hint-text" style="font-size: 15px; margin-top: 25px; margin-bottom: 10px;">قم بحفظ درجاتك وتقديراتك في مكانٍ واحد وبسهولة!</p>
 <div class="pdf-combined">
 <input type="text" class="pdf-name-input" id="student-name" placeholder="اكتب اسمك هنا">
 <button class="btn-pdf" onclick="exportPDF()">PDF</button>
 </div>
 </div>
 <div style="text-align:center; margin-top: 20px; color: #888; font-size: 13px;">
-<div>Developed by Abddelrahman Tarek<br>Special Physics Department</div>
-<div style="font-size: 12px;">لا تنسوا والدي من دعائكم بالرحمة والمغفرة</div>
+<div style="margin-top: 40px;">Developed by Abdelrahman Tarek</div>
+<div>Special Physics Department</div>
+<div>لا تنسوا والدي من دعائكم بالرحمة والمغفرة</div>
 </div>
 </div>
 </div>
 <script>
+function updateDarkIcon(isDark) {
+const icon = document.getElementById('dark-toggle-icon');
+if (!icon) return;
+icon.innerHTML = isDark
+? '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>'
+: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+}
+function toggleDarkMode() {
+document.body.classList.toggle('dark-mode');
+const isDark = document.body.classList.contains('dark-mode');
+try { localStorage.setItem('gpaDarkMode', isDark ? '1' : '0'); } catch (e) {}
+updateDarkIcon(isDark);
+}
+(function initDarkMode() {
+let saved = '0';
+try { saved = localStorage.getItem('gpaDarkMode') || '0'; } catch (e) {}
+if (saved === '1') { document.body.classList.add('dark-mode'); }
+updateDarkIcon(saved === '1');
+})();
+
 const coursesData = {
 physics: {
 1: {
@@ -2271,7 +2401,7 @@ const groupRows = Array.from(electiveRows).filter(r => r.getAttribute('data-grou
 const pick = parseInt(groupRows[0].getAttribute('data-pick')) || 1;
 const checkedCount = groupRows.filter(r => r.querySelector('.elective-radio') && r.querySelector('.elective-radio').checked).length;
 if (checkedCount !== pick) {
-showError("من فضلك اختر مادة اختيارية واحدة من الجدول أولاً!");
+showError("من فضلك اختر مادة من الجدول أولاً!");
 return;
 }
 }
@@ -2286,7 +2416,7 @@ totalWeight += (points * hours);
 totalHours += hours;
 });
 if (!ready) {
-showError("من فضلك أدخل كل درجات المواد المفعلة أولاً.");
+showError("من فضلك أدخل كل درجات المواد المفعلة أولاً!");
 return;
 }
 showError("");
@@ -2352,7 +2482,6 @@ return result;
 }
 function drawSmartLine(doc, text, x, y, opts = {}) {
 const { align = 'left', heightMM = 4.2 } = opts;
-if (containsArabic(text)) {
 const img = lineToImage(text, { ...opts, dir: align === 'right' ? 'rtl' : 'ltr' });
 const ratio = img.width / img.height;
 const wMM = heightMM * ratio;
@@ -2362,10 +2491,6 @@ else if (align === 'center') xPos = x - wMM / 2;
 const topY = y - heightMM * 0.68;
 doc.addImage(img.dataUrl, img.format || 'PNG', xPos, topY, wMM, heightMM, img.alias, 'FAST');
 return wMM;
-} else {
-doc.text(text, x, y, { align });
-return doc.getTextWidth(text);
-}
 }
 async function exportPDF() {
 if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
@@ -2477,8 +2602,15 @@ doc.line(14, currentY, pageW - 14, currentY);
 currentY += 8;
 doc.setFont('helvetica', 'bold');
 doc.setFontSize(14);
+const gpaLabel = 'Final Cumulative GPA: ';
+const gpaLabelW = doc.getTextWidth(gpaLabel);
+const gpaValueW = doc.getTextWidth(gpaText);
+let gpaLineX = pageW / 2 - (gpaLabelW + gpaValueW) / 2;
+doc.setTextColor(0, 0, 0);
+doc.text(gpaLabel, gpaLineX, currentY, { align: 'left' });
+gpaLineX += gpaLabelW;
 doc.setTextColor(46, 204, 113);
-doc.text(`Final Cumulative GPA: ${gpaText}`, pageW / 2, currentY, { align: 'center' });
+doc.text(gpaText, gpaLineX, currentY, { align: 'left' });
 currentY += 7;
 doc.setTextColor(44, 62, 80);
 doc.setFontSize(11);
