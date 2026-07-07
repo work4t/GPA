@@ -89,6 +89,15 @@ gap: 10px;
 flex-wrap: wrap;
 margin-top: 5px;
 }
+#method-wrapper .radio-group {
+flex-direction: column;
+}
+#method-wrapper .radio-card {
+min-width: 100%;
+}
+#method-wrapper .radio-label {
+justify-content: flex-start;
+}
 .radio-card {
 flex: 1;
 min-width: 130px;
@@ -201,6 +210,23 @@ box-sizing: border-box;
 }
 input[type="number"]:focus { border-color: var(--accent); }
 
+#prev-gpa {
+width: 100%;
+padding: 12px 15px;
+border-radius: 10px;
+border: 2px solid #e0e0e0;
+font-size: 16px;
+font-family: inherit;
+font-weight: 700;
+outline: none;
+background-color: #fafafa;
+color: #444;
+text-align: center;
+box-sizing: border-box;
+transition: border-color 0.2s;
+}
+#prev-gpa:focus { border-color: var(--accent); background-color: #fff; }
+
 .elective-radio {
 display: none;
 }
@@ -208,8 +234,9 @@ display: none;
 display: inline-flex;
 align-items: center;
 justify-content: center;
-width: 19px;
-height: 19px;
+width: 22px;
+height: 22px;
+box-sizing: border-box;
 border-radius: 50%;
 border: 2px solid #ccc;
 background: #f5f5f5;
@@ -226,8 +253,8 @@ border-color: var(--accent);
 stroke: #fff !important;
 }
 .elective-check-label svg {
-width: 11px;
-height: 11px;
+width: 14px;
+height: 14px;
 stroke: transparent;
 stroke-width: 3;
 fill: none;
@@ -259,7 +286,7 @@ stroke-linejoin: round;
 display: block;
 width: 100%;
 padding: 15px;
-margin-top: 25px;
+margin-top: 10px;
 background-color: var(--primary);
 color: white;
 border: none;
@@ -272,6 +299,24 @@ transition: background-color 0.2s, transform 0.1s;
 }
 .btn-calc:hover { background-color: #1b4d8a; }
 .btn-calc:active { transform: scale(0.99); }
+
+.btn-reset { display: none; }
+.reset-link-wrapper {
+text-align: center;
+margin-top: 20px;
+margin-bottom: 22px;
+}
+.reset-link {
+display: inline-block;
+color: var(--danger);
+text-decoration: underline;
+font-size: 16px;
+font-weight: 600;
+cursor: pointer;
+user-select: none;
+}
+.reset-link:hover { opacity: 0.75; }
+
 
 #result-box {
 margin-top: 25px;
@@ -497,8 +542,28 @@ flex-shrink: 0;
 </div>
 </div>
 </div>
+<div class="selector-field hidden" id="method-wrapper">
+<label>حساب المعدل التراكمي العام عن طريق :</label>
+<div class="radio-group">
+<div class="radio-card">
+<input type="radio" id="method-manual" name="method-select" value="manual" onchange="handleMethodChange()">
+<label for="method-manual" class="radio-label">إدخال الدرجات يدوياً</label>
+</div>
+<div class="radio-card">
+<input type="radio" id="method-shortcut" name="method-select" value="shortcut" onchange="handleMethodChange()">
+<label for="method-shortcut" class="radio-label">إدخال آخر GPA تراكمي عام </label>
+</div>
+</div>
+</div>
 </div>
 <div id="placeholder-message" class="placeholder-msg hidden">جاري العمل على إضافة المواد الخاصة بهذا الخيار حالياً...</div>
+<div id="shortcut-wrapper" class="hidden">
+<div class="selector-field" style="margin-bottom:20px;">
+<label for="prev-gpa">قم بإدخال تقديرك التراكمي العام إلي نهاية العام الدراسي الماضي :</label>
+<input type="number" id="prev-gpa" step="0.01" min="0" max="5" placeholder="مثال: 4.45" oninput="handlePrevGpaInput()">
+</div>
+<div id="shortcut-accordion" class="accordion-wrapper"></div>
+</div>
 <div id="dynamic-table-wrapper" class="hidden">
 <div class="table-container">
 <table>
@@ -522,6 +587,7 @@ flex-shrink: 0;
 <div id="accordion-wrapper" class="accordion-wrapper hidden"></div>
 <div id="content-footer" class="hidden">
 <div id="error-box"></div>
+<div class="reset-link-wrapper"><span class="reset-link" onclick="resetCurrentSection()"><b>Reset<b></span></div>
 <button class="btn-calc" onclick="calculateGPA()">احسب الـ GPA</button>
 <div id="result-box">
 <h3>معدلك النهائي:</h3>
@@ -537,6 +603,10 @@ flex-shrink: 0;
 <input type="text" class="pdf-name-input" id="student-name" placeholder="اكتب اسمك هنا">
 <button class="btn-pdf" onclick="exportPDF()">PDF</button>
 </div>
+</div>
+<div style="text-align:center; margin-top: 20px; color: #888; font-size: 13px;">
+<div>Developed by Abddelrahman Tarek<br>Special Physics Department</div>
+<div style="font-size: 12px;">لا تنسوا والدي من دعائكم بالرحمة والمغفرة</div>
 </div>
 </div>
 </div>
@@ -568,6 +638,85 @@ t2: [
 { name: "تاريخ وفلسفة العلوم", hours: 2, isElective: true, group: "t2g2", id: "history_sci" },
 { name: "حقوق الانسان ومكافحة الفساد", hours: 2, isElective: true, group: "t2g2", id: "human_rights" }
 ]
+},
+2: {
+t1: [
+{ name: "تحليل وعرض البيانات", hours: 2, isElective: false },
+{ name: "كيمياء عضوية وحيوية", hours: 2, isElective: false },
+{ name: "فيزياء عامة 2", hours: 2, isElective: false },
+{ name: "تفاضل وتكامل متقدم", hours: 2, isElective: false },
+{ name: "معادلات تفاضلية عادية", hours: 2, isElective: false },
+{ name: "ميكانيكا كلاسيكية 2", hours: 2, isElective: false },
+{ name: "موجات", hours: 2, isElective: true, group: "phy_y2t1_elec", pick: 2, id: "phy_y2t1_waves" },
+{ name: "دوائر كهربية", hours: 2, isElective: true, group: "phy_y2t1_elec", pick: 2, id: "phy_y2t1_circuits" },
+{ name: "فيزياء رياضية عامة", hours: 2, isElective: true, group: "phy_y2t1_elec", pick: 2, id: "phy_y2t1_math_phys" },
+{ name: "الوقاية من الإشعاع", hours: 2, isElective: true, group: "phy_y2t1_elec", pick: 2, id: "phy_y2t1_rad_protect" }
+],
+t2: [
+{ name: "تطوير مواقع ويب", hours: 2, isElective: false },
+{ name: "كيمياء تحليلية وفيزيائية", hours: 2, isElective: false },
+{ name: "فيزياء عامة 3", hours: 2, isElective: false },
+{ name: "معادلات تفاضيلة جزئية 1", hours: 2, isElective: false },
+{ name: "فيزياء عملية", hours: 2, isElective: false },
+{ name: "فيزياء رياضية 2", hours: 2, isElective: false },
+{ name: "بصريات فيزيائية 1", hours: 2, isElective: true, group: "phy_y2t2_elec", pick: 2, id: "phy_y2t2_optics1" },
+{ name: "كهرومغناطيسية", hours: 2, isElective: true, group: "phy_y2t2_elec", pick: 2, id: "phy_y2t2_em" },
+{ name: "فيزياء صوتية", hours: 2, isElective: true, group: "phy_y2t2_elec", pick: 2, id: "phy_y2t2_acoustics" },
+{ name: "فيزياء بيئية 2", hours: 2, isElective: true, group: "phy_y2t2_elec", pick: 2, id: "phy_y2t2_env2" }
+]
+},
+3: {
+t1: [
+{ name: "فيزياء عملية", hours: 2, isElective: false },
+{ name: "فيزياء إحصائية", hours: 2, isElective: false },
+{ name: "ميكانيكا الكم 1", hours: 2, isElective: false },
+{ name: "ميكانيكا نسبية", hours: 2, isElective: false },
+{ name: "إلكترونيات تماثلية", hours: 2, isElective: false },
+{ name: "فيزياء حسابية وعددية", hours: 2, isElective: false },
+{ name: "تحليل عددي", hours: 2, isElective: false },
+{ name: "كهرومغناطيسية 2", hours: 2, isElective: true, group: "phy_y3t1_elec", pick: 2, id: "phy_y3t1_em2" },
+{ name: "فيزياء حيوية عامة", hours: 2, isElective: true, group: "phy_y3t1_elec", pick: 2, id: "phy_y3t1_biophys" },
+{ name: "بصريات غير خطية", hours: 2, isElective: true, group: "phy_y3t1_elec", pick: 2, id: "phy_y3t1_nonlinear_optics" },
+{ name: "تاريخ وفلسفة الفيزياء", hours: 2, isElective: true, group: "phy_y3t1_elec", pick: 2, id: "phy_y3t1_history" }
+],
+t2: [
+{ name: "فيزياء عملية", hours: 2, isElective: false },
+{ name: "ميكانيكا الكم 2", hours: 3, isElective: false },
+{ name: "فيزياء نووية 1", hours: 2, isElective: false },
+{ name: "فيزياء جوامد 1", hours: 2, isElective: false },
+{ name: "فيزياء الليزر وتطبيقاتها", hours: 2, isElective: false },
+{ name: "فيزياء ذرية وجزيئية", hours: 2, isElective: false },
+{ name: "ديناميكا الموائع", hours: 2, isElective: true, group: "phy_y3t2_elec", pick: 2, id: "phy_y3t2_fluid" },
+{ name: "بلورات وأشعة", hours: 2, isElective: true, group: "phy_y3t2_elec", pick: 2, id: "phy_y3t2_crystal" },
+{ name: "فيزياء الطاقة", hours: 2, isElective: true, group: "phy_y3t2_elec", pick: 2, id: "phy_y3t2_energy" },
+{ name: "فيزياء النبائط", hours: 2, isElective: true, group: "phy_y3t2_elec", pick: 2, id: "phy_y3t2_devices" }
+]
+},
+4: {
+t1: [
+{ name: "مشروع التخرج", hours: 2, isElective: false },
+{ name: "فيزياء عملية", hours: 2, isElective: false },
+{ name: "فيزياء نووية 2", hours: 2, isElective: false },
+{ name: "فيزياء الطاقة المتجددة", hours: 2, isElective: false },
+{ name: "نظرية الزمر", hours: 2, isElective: false },
+{ name: "موضوعات مختارة 1", hours: 2, isElective: false },
+{ name: "نظرية المجال", hours: 2, isElective: true, group: "phy_y4t1_elec", pick: 2, id: "phy_y4t1_field_theory" },
+{ name: "مقدمة في علوم النانو", hours: 2, isElective: true, group: "phy_y4t1_elec", pick: 2, id: "phy_y4t1_nano" },
+{ name: "المعالجة الدقيقة", hours: 2, isElective: true, group: "phy_y4t1_elec", pick: 2, id: "phy_y4t1_microprocessing" },
+{ name: "الموصلية الفائقة وتطبيقاتها", hours: 2, isElective: true, group: "phy_y4t1_elec", pick: 2, id: "phy_y4t1_superconductivity" }
+],
+t2: [
+{ name: "فيزياء عملية", hours: 2, isElective: false },
+{ name: "فيزياء إحصائية 2", hours: 2, isElective: false },
+{ name: "فيزياء الجسيمات الأولية", hours: 2, isElective: false },
+{ name: "فيزياء البلازما", hours: 2, isElective: false },
+{ name: "إلكترونيات رقمية", hours: 2, isElective: false },
+{ name: "موضوعات مختارة 2", hours: 2, isElective: false },
+{ name: "مقدمة في فيزياء الحالة المكثفة", hours: 2, isElective: true, group: "phy_y4t2_elec", pick: 2, id: "phy_y4t2_condensed_matter_intro" },
+{ name: "ميكانيكا الكم النسبية", hours: 2, isElective: true, group: "phy_y4t2_elec", pick: 2, id: "phy_y4t2_relativistic_qm" },
+{ name: "فيزياء الحرارة المنخفضة", hours: 2, isElective: true, group: "phy_y4t2_elec", pick: 2, id: "phy_y4t2_low_temp" },
+{ name: "مبادىء وتكنولوجيا التفريغ والاغشية الرقيقة", hours: 2, isElective: true, group: "phy_y4t2_elec", pick: 2, id: "phy_y4t2_vacuum_thinfilm" }
+]
 }
 },
 cs: {
@@ -593,6 +742,81 @@ t2: [
 { name: "الكمبيوتر المايكرو وتطبيقاته", hours: 2, isElective: true, group: "cs_t2g1", id: "cs_micro_computer" },
 { name: "تاريخ وفلسفة العلوم", hours: 2, isElective: true, group: "cs_t2g2", id: "cs_history_sci" },
 { name: "حقوق الانسان ومكافحة الفساد", hours: 2, isElective: true, group: "cs_t2g2", id: "cs_human_rights" }
+]
+},
+2: {
+t1: [
+{ name: "تحليل وعرض بيانات", hours: 2, isElective: false },
+{ name: "كيمياء عضوية وحيوية", hours: 2, isElective: false },
+{ name: "فيزياء عامة 2", hours: 2, isElective: false },
+{ name: "تفاضل وتكامل متقدم", hours: 2, isElective: false },
+{ name: "جبر خطي 1", hours: 2, isElective: false },
+{ name: "البرمجة الموجهة", hours: 2, isElective: false },
+{ name: "الرياضيات والإحصاء", hours: 2, isElective: true, group: "cs_y2t1_elec", pick: 2, id: "cs_y2t1_math_stats" },
+{ name: "بحوث عمليات", hours: 2, isElective: true, group: "cs_y2t1_elec", pick: 2, id: "cs_y2t1_operations_research" },
+{ name: "المنطق الرياضي والجبر البولياني", hours: 2, isElective: true, group: "cs_y2t1_elec", pick: 2, id: "cs_y2t1_boolean_logic" }
+],
+t2: [
+{ name: "تطوير مواقع الويب", hours: 2, isElective: false },
+{ name: "كيمياء تحليلية وفيزيائية", hours: 2, isElective: false },
+{ name: "فيزياء عامة 3", hours: 2, isElective: false },
+{ name: "مبادئ التحليل الرياضي", hours: 2, isElective: false },
+{ name: "رياضيات متقطعة", hours: 2, isElective: false },
+{ name: "هياكل البيانات والخوارزميات", hours: 2, isElective: false },
+{ name: "نظرية الاحتمالات", hours: 2, isElective: false },
+{ name: "معادلات تفاضلية عادية", hours: 2, isElective: true, group: "cs_y2t2_elec", pick: 2, id: "cs_y2t2_ode" },
+{ name: "جبر خطي 2", hours: 2, isElective: true, group: "cs_y2t2_elec", pick: 2, id: "cs_y2t2_linear_algebra2" },
+{ name: "لغات وبرمجة", hours: 2, isElective: true, group: "cs_y2t2_elec", pick: 2, id: "cs_y2t2_languages_programming" }
+]
+},
+3: {
+t1: [
+{ name: "تحليل عددي 1", hours: 2, isElective: false },
+{ name: "تحليل وتصميم الخوارزميات", hours: 2, isElective: false },
+{ name: "رسومات الحاسب", hours: 3, isElective: false },
+{ name: "نظم قواعد البيانات", hours: 2, isElective: false },
+{ name: "تحليل وتصميم النظم", hours: 2, isElective: false },
+{ name: "تنظيم الحاسب", hours: 2, isElective: false },
+{ name: "البرمجة المرئية", hours: 2, isElective: true, group: "cs_y3t1_elec", pick: 2, id: "cs_y3t1_visual_programming" },
+{ name: "النظرية الآلية واللغات", hours: 2, isElective: true, group: "cs_y3t1_elec", pick: 2, id: "cs_y3t1_automata_languages" },
+{ name: "تنظيم ومعالجة الملفات", hours: 2, isElective: true, group: "cs_y3t1_elec", pick: 2, id: "cs_y3t1_file_organization" },
+{ name: "موضوعات مختارة في الحاسب 1", hours: 2, isElective: true, group: "cs_y3t1_elec", pick: 2, id: "cs_y3t1_selected_topics1" }
+],
+t2: [
+{ name: "نظم تشغيل الحاسب", hours: 3, isElective: false },
+{ name: "تطوير البرمجيات", hours: 3, isElective: false },
+{ name: "تصميم قواعد البيانات", hours: 3, isElective: false },
+{ name: "رسومات الحاسب المتقدمة", hours: 2, isElective: false },
+{ name: "الشبكات العصبية", hours: 2, isElective: false },
+{ name: "المحاكاة والنمذجة", hours: 2, isElective: true, group: "cs_y3t2_elec", pick: 2, id: "cs_y3t2_simulation_modeling" },
+{ name: "هندسة البرمجيات", hours: 2, isElective: true, group: "cs_y3t2_elec", pick: 2, id: "cs_y3t2_software_engineering" },
+{ name: "معالجة الصور", hours: 2, isElective: true, group: "cs_y3t2_elec", pick: 2, id: "cs_y3t2_image_processing" },
+{ name: "موضوعات مختارة في الحاسب 2", hours: 2, isElective: true, group: "cs_y3t2_elec", pick: 2, id: "cs_y3t2_selected_topics2" }
+]
+},
+4: {
+t1: [
+{ name: "مشروع تخرج", hours: 2, isElective: false },
+{ name: "النظم الموزعة", hours: 2, isElective: false },
+{ name: "شبكات الحاسب", hours: 3, isElective: false },
+{ name: "الأوتوماتيكية واللغات الشكلية", hours: 3, isElective: false },
+{ name: "نظرية الأعداد", hours: 2, isElective: false },
+{ name: "الذكاء الاصطناعي", hours: 2, isElective: false },
+{ name: "تطوير مواقع الويب المتقدم", hours: 2, isElective: true, group: "cs_y4t1_elec", pick: 2, id: "cs_y4t1_advanced_web_dev" },
+{ name: "معمارية الحاسب", hours: 2, isElective: true, group: "cs_y4t1_elec", pick: 2, id: "cs_y4t1_computer_architecture" },
+{ name: "نظم المعلومات الإدارية", hours: 2, isElective: true, group: "cs_y4t1_elec", pick: 2, id: "cs_y4t1_mis" },
+{ name: "موضوعات مختارة في الحاسب 3", hours: 2, isElective: true, group: "cs_y4t1_elec", pick: 2, id: "cs_y4t1_selected_topics3" }
+],
+t2: [
+{ name: "النظم الموزعة المتقدمة", hours: 2, isElective: false },
+{ name: "تعلم الآلة", hours: 2, isElective: false },
+{ name: "نظرية التشفير", hours: 2, isElective: false },
+{ name: "تصميم لغات البرمجة", hours: 3, isElective: false },
+{ name: "شبكات الحاسب المتقدمة", hours: 3, isElective: false },
+{ name: "نظام تشغيل متقدم", hours: 2, isElective: true, group: "cs_y4t2_elec", pick: 2, id: "cs_y4t2_advanced_os" },
+{ name: "معمارية الحاسب المتقدمة", hours: 2, isElective: true, group: "cs_y4t2_elec", pick: 2, id: "cs_y4t2_advanced_architecture" },
+{ name: "برمجة الأنظمة الحيوية", hours: 2, isElective: true, group: "cs_y4t2_elec", pick: 2, id: "cs_y4t2_bio_systems_programming" },
+{ name: "موضوعات مختارة في الحاسب 4", hours: 2, isElective: true, group: "cs_y4t2_elec", pick: 2, id: "cs_y4t2_selected_topics4" }
 ]
 }
 },
@@ -697,6 +921,33 @@ t2: [
 { name: "كيمياء المنتجات الطبيعة", hours: 2, isElective: true, group: "cb_y3t2g2", id: "cb_y3t2_natural_products_chem" },
 { name: "تطبيقات جزئية طيفية طبية", hours: 2, isElective: true, group: "cb_y3t2g2", id: "cb_y3t2_medical_spectral_apps" }
 ]
+},
+4: {
+t1: [
+{ name: "مشروع تخرج", hours: 2, isElective: false },
+{ name: "كيمياء الأطياف الجزئية والتطبيقية", hours: 2, isElective: false },
+{ name: "كيمياء البلمرات الطبيعية", hours: 2, isElective: false },
+{ name: "كيمياء المناعة", hours: 2, isElective: false },
+{ name: "تكنولوجيا الأحماض النووية", hours: 2, isElective: false },
+{ name: "كيمياء الأورام", hours: 2, isElective: false },
+{ name: "كيمياء الأحماض النووية والنيوكليتدات", hours: 2, isElective: false },
+{ name: "علم التغذية", hours: 2, isElective: true, group: "cb_y4t1g1", id: "cb_y4t1_nutrition_science" },
+{ name: "كيمياء وبيولوجيا ضوئية", hours: 2, isElective: true, group: "cb_y4t1g1", id: "cb_y4t1_photobiology_chem" },
+{ name: "كيمياء السطوح", hours: 2, isElective: true, group: "cb_y4t1g2", id: "cb_y4t1_surface_chem" },
+{ name: "كيمياء المحاليل الغروية", hours: 2, isElective: true, group: "cb_y4t1g2", id: "cb_y4t1_colloidal_solutions_chem" }
+],
+t2: [
+{ name: "كيمياء إشعاعية نووية", hours: 2, isElective: false },
+{ name: "كيمياء فيزيائية البلمرات", hours: 2, isElective: false },
+{ name: "كيمياء كهربية", hours: 2, isElective: false },
+{ name: "ميكانيكا التفاعلات العضوية", hours: 2, isElective: false },
+{ name: "علم السموم", hours: 2, isElective: false },
+{ name: "ايض الفيتامينات والمعادن", hours: 2, isElective: false },
+{ name: "مقدمة في الطب الشرعي", hours: 2, isElective: true, group: "cb_y4t2g1", id: "cb_y4t2_forensic_medicine_intro" },
+{ name: "مقدمة في التكنولوجيا الحيوية", hours: 2, isElective: true, group: "cb_y4t2g1", id: "cb_y4t2_biotech_intro" },
+{ name: "كيمياء المبيدات", hours: 2, isElective: true, group: "cb_y4t2g2", id: "cb_y4t2_pesticides_chem" },
+{ name: "التحليل الحراري", hours: 2, isElective: true, group: "cb_y4t2g2", id: "cb_y4t2_thermal_analysis" }
+]
 }
 },
 micro_chem: {
@@ -776,6 +1027,33 @@ t2: [
 { name: "كيمياء المنتجات الطبيعية", hours: 2, isElective: true, group: "mc_y3t2g2", id: "mc_y3t2_natural_products_chem" },
 { name: "كيمياء المواد الملونة", hours: 2, isElective: true, group: "mc_y3t2g2", id: "mc_y3t2_colorants_chem" }
 ]
+},
+4: {
+t1: [
+{ name: "مشروع التخرج", hours: 2, isElective: false },
+{ name: "فيروسات", hours: 2, isElective: false },
+{ name: "تقنية المزارع الطحلبية", hours: 2, isElective: false },
+{ name: "موضوعات مختارة 3", hours: 2, isElective: false },
+{ name: "كيمياء الأطياف الجزيئية التطبيقية", hours: 2, isElective: false },
+{ name: "كيمياء كهربية", hours: 2, isElective: false },
+{ name: "كيمياء البلمرات الطبيعية", hours: 2, isElective: false },
+{ name: "تدريبات في تقنيات الميكروبيولوجيا الغذائية والبيئة وصحة الإنسان", hours: 2, isElective: true, group: "mc_y4t1g1", id: "mc_y4t1_food_env_health_micro_training" },
+{ name: "تدريبات في ميكروبيولوجيا المعامل الصحية", hours: 2, isElective: true, group: "mc_y4t1g1", id: "mc_y4t1_health_labs_micro_training" },
+{ name: "كيمياء السطوح", hours: 2, isElective: true, group: "mc_y4t1g2", id: "mc_y4t1_surface_chem" },
+{ name: "كيمياء المحاليل الغروية", hours: 2, isElective: true, group: "mc_y4t1g2", id: "mc_y4t1_colloidal_solutions_chem" }
+],
+t2: [
+{ name: "موضوعات مختارة 4", hours: 2, isElective: false },
+{ name: "الأيض الميكروبي", hours: 2, isElective: false },
+{ name: "أمراض نبات ووقاية", hours: 2, isElective: false },
+{ name: "كيمياء نووية وإشعاعية", hours: 2, isElective: false },
+{ name: "ميكانيكية التفاعلات العضوية", hours: 2, isElective: false },
+{ name: "كيمياء البلمرات الفيزيائية", hours: 2, isElective: false },
+{ name: "كيمياء المبيدات", hours: 2, isElective: true, group: "mc_y4t2g1", id: "mc_y4t2_pesticides_chem" },
+{ name: "كيمياء الحفز", hours: 2, isElective: true, group: "mc_y4t2g1", id: "mc_y4t2_catalysis_chem" },
+{ name: "بيولوجيا جزيئية ميكروبية", hours: 2, isElective: true, group: "mc_y4t2g2", id: "mc_y4t2_microbial_molecular_biology" },
+{ name: "وراثة ميكروبية متقدمة", hours: 2, isElective: true, group: "mc_y4t2g2", id: "mc_y4t2_advanced_microbial_genetics" }
+]
 }
 },
 botany_chem: {
@@ -800,6 +1078,87 @@ t2: [
 { name: "علم النبات التطبيقي", hours: 2, isElective: true, group: "bc_t2g1", id: "bc_applied_botany" },
 { name: "تاريخ وفلسفة العلوم", hours: 2, isElective: true, group: "bc_t2g2", id: "bc_history_sci" },
 { name: "حقوق الانسان ومكافحة الفساد", hours: 2, isElective: true, group: "bc_t2g2", id: "bc_human_rights" }
+]
+},
+2: {
+t1: [
+{ name: "مبادئ برمجة", hours: 2, isElective: false },
+{ name: "كيمياء تحليلية وفيزيائية", hours: 2, isElective: false },
+{ name: "فيزياء عامة 2", hours: 2, isElective: false },
+{ name: "رياضة عامة 1", hours: 2, isElective: false },
+{ name: "تشريح وتقسيم", hours: 2, isElective: false },
+{ name: "كيمياء عضوية 2", hours: 2, isElective: false },
+{ name: "كيمياء المحاليل الالكترولتية", hours: 2, isElective: false },
+{ name: "كيمياء المركبات الاروماتية", hours: 2, isElective: true, group: "bc_y2t1g1", id: "bc_y2t1_aromatic_chem" },
+{ name: "كيمياء المواد المنظمة", hours: 2, isElective: true, group: "bc_y2t1g1", id: "bc_y2t1_surfactants_chem" },
+{ name: "علم الطحالب", hours: 2, isElective: true, group: "bc_y2t1g2", id: "bc_y2t1_algology" },
+{ name: "أمراض نبات ووقاية", hours: 2, isElective: true, group: "bc_y2t1g2", id: "bc_y2t1_plant_pathology" }
+],
+t2: [
+{ name: "تحليل وعرض بيانات", hours: 2, isElective: false },
+{ name: "فيزياء عامة 3", hours: 2, isElective: false },
+{ name: "رياضة عامة 2", hours: 2, isElective: false },
+{ name: "أساسيات علم الحيوان 2 (لافقاريات وفقاريات)", hours: 2, isElective: false },
+{ name: "بيئة نبات", hours: 2, isElective: false },
+{ name: "كيمياء عامة 3", hours: 2, isElective: false },
+{ name: "كيمياء الأدوية", hours: 2, isElective: true, group: "bc_y2t2g1", id: "bc_y2t2_pharma_chem" },
+{ name: "كيمياء الأصباغ", hours: 2, isElective: true, group: "bc_y2t2g1", id: "bc_y2t2_dyes_chem" },
+{ name: "أرشيجونات", hours: 2, isElective: true, group: "bc_y2t2g2", id: "bc_y2t2_archegoniates" },
+{ name: "علم حبوب اللقاح", hours: 2, isElective: true, group: "bc_y2t2g2", id: "bc_y2t2_palynology" }
+]
+},
+3: {
+t1: [
+{ name: "جيولوجيا عامة 2", hours: 2, isElective: false },
+{ name: "تطوير مواقع ويب", hours: 2, isElective: false },
+{ name: "خلية ووراثة", hours: 2, isElective: false },
+{ name: "الماء والذائبات في النبات", hours: 2, isElective: false },
+{ name: "إنزيمات وأيض أولي", hours: 2, isElective: false },
+{ name: "كيمياء العناصر الانتقالية", hours: 2, isElective: false },
+{ name: "كيمياء الديناميكا الحرارية", hours: 2, isElective: false },
+{ name: "التحليل باستخدام الأجهزة", hours: 2, isElective: true, group: "bc_y3t1g1", id: "bc_y3t1_instrumental_analysis" },
+{ name: "التحليل باستخدام الطبقة الرقيقة", hours: 2, isElective: true, group: "bc_y3t1g1", id: "bc_y3t1_tlc_analysis" },
+{ name: "تلوث بيئي", hours: 2, isElective: true, group: "bc_y3t1g2", id: "bc_y3t1_environmental_pollution" },
+{ name: "علاقة النبات بالتربة", hours: 2, isElective: true, group: "bc_y3t1g2", id: "bc_y3t1_plant_soil_relation" }
+],
+t2: [
+{ name: "تصنيف زهري", hours: 2, isElective: false },
+{ name: "نباتات طبية", hours: 2, isElective: false },
+{ name: "كيمياء التركيب والطيف الجزيئي", hours: 2, isElective: false },
+{ name: "كيمياء حركية التفاعلات الكيميائية", hours: 2, isElective: false },
+{ name: "كيمياء عضوية غير متجانسة الحلقات", hours: 2, isElective: false },
+{ name: "كيمياء عضوية فيزيائية", hours: 2, isElective: false },
+{ name: "كيمياء المنتجات الطبيعية", hours: 2, isElective: true, group: "bc_y3t2g1", id: "bc_y3t2_natural_products_chem" },
+{ name: "كيمياء المواد الملونة", hours: 2, isElective: true, group: "bc_y3t2g1", id: "bc_y3t2_colorants_chem" },
+{ name: "صون وتنوع نباتي", hours: 2, isElective: true, group: "bc_y3t2g2", id: "bc_y3t2_plant_conservation_diversity" },
+{ name: "تصنيف حيوي", hours: 2, isElective: true, group: "bc_y3t2g2", id: "bc_y3t2_biosystematics" }
+]
+},
+4: {
+t1: [
+{ name: "مشروع التخرج", hours: 2, isElective: false },
+{ name: "كيمياء الأطياف الجزئية التطبيقية", hours: 2, isElective: false },
+{ name: "ميكانيكا التفاعلات العضوية", hours: 2, isElective: false },
+{ name: "كيمياء البلمرات التطبيقية", hours: 2, isElective: false },
+{ name: "كساء نباتي", hours: 2, isElective: false },
+{ name: "فسيولوجيا الإجهاد", hours: 2, isElective: false },
+{ name: "بيولوجيا جزيئية", hours: 2, isElective: false },
+{ name: "كيمياء الأسطح", hours: 2, isElective: true, group: "bc_y4t1g1", id: "bc_y4t1_surface_chem" },
+{ name: "كيمياء المحاليل الغروية", hours: 2, isElective: true, group: "bc_y4t1g1", id: "bc_y4t1_colloidal_solutions_chem" },
+{ name: "بيئة صحراوية", hours: 2, isElective: true, group: "bc_y4t1g2", id: "bc_y4t1_desert_ecology" },
+{ name: "جغرافيا ومجتمع نباتي", hours: 2, isElective: true, group: "bc_y4t1g2", id: "bc_y4t1_plant_geography_community" }
+],
+t2: [
+{ name: "كيمياء نووية وإشعاعية", hours: 2, isElective: false },
+{ name: "كيمياء كهربية", hours: 2, isElective: false },
+{ name: "كيمياء البلمرات الفيزيائية", hours: 2, isElective: false },
+{ name: "فلورا حقلية", hours: 2, isElective: false },
+{ name: "هرمونات وزراعة أنسجة", hours: 2, isElective: false },
+{ name: "تطبيقات البيولوجيا الجزيئية", hours: 2, isElective: false },
+{ name: "أيض ثانوي ونواتجه", hours: 2, isElective: true, group: "bc_y4t2g1", id: "bc_y4t2_secondary_metabolism" },
+{ name: "فسيولوجيا الأزهار والثمار", hours: 2, isElective: true, group: "bc_y4t2g1", id: "bc_y4t2_flower_fruit_physiology" },
+{ name: "كيمياء المبيدات", hours: 2, isElective: true, group: "bc_y4t2g2", id: "bc_y4t2_pesticides_chem" },
+{ name: "كيمياء الحفز", hours: 2, isElective: true, group: "bc_y4t2g2", id: "bc_y4t2_catalysis_chem" }
 ]
 }
 },
@@ -879,6 +1238,32 @@ t2: [
 { name: "المنطق الرياضي", hours: 2, isElective: true, group: "math_y3t2g1", id: "math_y3t2_math_logic", pick: 2 },
 { name: "موضوعات مختارة في الرياضيات 2", hours: 2, isElective: true, group: "math_y3t2g1", id: "math_y3t2_selected_topics2", pick: 2 }
 ]
+},
+4: {
+t1: [
+{ name: "مشروع تخرج", hours: 2, isElective: false },
+{ name: "تحليل دالي", hours: 2, isElective: false },
+{ name: "ديناميكا الموائع 1", hours: 2, isElective: false },
+{ name: "تحليل مركب 1", hours: 2, isElective: false },
+{ name: "ميكانيكا الكم 1", hours: 2, isElective: false },
+{ name: "هندسة تفاضلية 1", hours: 2, isElective: false },
+{ name: "معادلات تفاضلية جزيئية 1", hours: 2, isElective: false },
+{ name: "طرق رياضية 2", hours: 2, isElective: true, group: "math_y4t1g1", id: "math_y4t1_methods2", pick: 2 },
+{ name: "نظرية الاعداد", hours: 2, isElective: true, group: "math_y4t1g1", id: "math_y4t1_number_theory", pick: 2 },
+{ name: "الحلول العددية للمعادلات التكاملية", hours: 2, isElective: true, group: "math_y4t1g1", id: "math_y4t1_numerical_integral_eq", pick: 2 },
+{ name: "موضوعات مختارة في الرياضيات 3", hours: 2, isElective: true, group: "math_y4t1g1", id: "math_y4t1_selected_topics3", pick: 2 }
+],
+t2: [
+{ name: "ديناميكا الموائع 2", hours: 2, isElective: false },
+{ name: "تحليل مركب 2", hours: 2, isElective: false },
+{ name: "ميكانيكا الكم 2", hours: 2, isElective: false },
+{ name: "هندسة تفاضلية 2", hours: 2, isElective: false },
+{ name: "معادلات تفاضلية جزيئية 2", hours: 2, isElective: false },
+{ name: "نظرية الحلقات والحلول", hours: 2, isElective: false },
+{ name: "نظرية البلازما", hours: 2, isElective: true, group: "math_y4t2g1", id: "math_y4t2_plasma_theory", pick: 2 },
+{ name: "بحوث العمليات", hours: 2, isElective: true, group: "math_y4t2g1", id: "math_y4t2_operations_research", pick: 2 },
+{ name: "موضوعات مختارة في الرياضيات 4", hours: 2, isElective: true, group: "math_y4t2g1", id: "math_y4t2_selected_topics4", pick: 2 }
+]
 }
 },
 math_physics: {
@@ -906,6 +1291,86 @@ t2: [
 { name: "تاريخ وفلسفة العلوم", hours: 2, isElective: true, group: "mp_t2g2", id: "mp_history_sci" },
 { name: "حقوق الانسان ومكافحة الفساد", hours: 2, isElective: true, group: "mp_t2g2", id: "mp_human_rights" }
 ]
+},
+2: {
+t1: [
+{ name: "تحليل وعرض بيانات", hours: 2, isElective: false },
+{ name: "كيمياء عضوية وحيوية", hours: 2, isElective: false },
+{ name: "فيزياء عامة 2", hours: 2, isElective: false },
+{ name: "تفاضل وتكامل متقدم", hours: 2, isElective: false },
+{ name: "فيزياء حديثة", hours: 2, isElective: false },
+{ name: "جبر خطي 1", hours: 2, isElective: false },
+{ name: "هندسة فراغية", hours: 2, isElective: true, group: "mp_y2t1g1", id: "mp_y2t1_solid_geometry" },
+{ name: "رياضيات متقطعة", hours: 2, isElective: true, group: "mp_y2t1g1", id: "mp_y2t1_discrete_math" },
+{ name: "موجات", hours: 2, isElective: true, group: "mp_y2t1g2", id: "mp_y2t1_waves" },
+{ name: "دوائر كهربية", hours: 2, isElective: true, group: "mp_y2t1g2", id: "mp_y2t1_circuits" }
+],
+t2: [
+{ name: "تطوير مواقع الويب", hours: 2, isElective: false },
+{ name: "كيمياء تحليلية وفيزيائية", hours: 2, isElective: false },
+{ name: "فيزياء عامة 3", hours: 2, isElective: false },
+{ name: "مبادئ التحليل الرياضي", hours: 2, isElective: false },
+{ name: "معادلات تفاضلية عادية", hours: 2, isElective: false },
+{ name: "نظرية الاحتمالات", hours: 2, isElective: false },
+{ name: "بصريات فيزيائية 1", hours: 2, isElective: false },
+{ name: "جبر خطي 2", hours: 2, isElective: true, group: "mp_y2t2g1", id: "mp_y2t2_linear_algebra2" },
+{ name: "تحليل المتجهات", hours: 2, isElective: true, group: "mp_y2t2g1", id: "mp_y2t2_vector_analysis" },
+{ name: "كهرومغناطيسية 1", hours: 2, isElective: true, group: "mp_y2t2g2", id: "mp_y2t2_electromagnetism1" },
+{ name: "فيزياء صوتية", hours: 2, isElective: true, group: "mp_y2t2g2", id: "mp_y2t2_acoustics" }
+]
+},
+3: {
+t1: [
+{ name: "تحليل عددي 1", hours: 2, isElective: false },
+{ name: "توبولوجي 1", hours: 2, isElective: false },
+{ name: "جبر مجرد 1", hours: 2, isElective: false },
+{ name: "ميكانيكا الكم 1", hours: 2, isElective: false },
+{ name: "إلكترونيات تماثلية", hours: 2, isElective: false },
+{ name: "فيزياء رياضية 1", hours: 3, isElective: false },
+{ name: "نظرية المعادلات التفاضلية", hours: 2, isElective: true, group: "mp_y3t1g1", id: "mp_y3t1_diff_eq_theory" },
+{ name: "موضوعات مختارة في الرياضيات 1", hours: 2, isElective: true, group: "mp_y3t1g1", id: "mp_y3t1_selected_topics_math1" },
+{ name: "فيزياء حسابية وعددية", hours: 2, isElective: true, group: "mp_y3t1g2", id: "mp_y3t1_computational_physics" },
+{ name: "كهرومغناطيسية 2", hours: 2, isElective: true, group: "mp_y3t1g2", id: "mp_y3t1_electromagnetism2" }
+],
+t2: [
+{ name: "جبر مجرد 2", hours: 2, isElective: false },
+{ name: "تحليل حقيقي", hours: 3, isElective: false },
+{ name: "دوال خاصة", hours: 2, isElective: false },
+{ name: "فيزياء عملية", hours: 6, isElective: false },
+{ name: "فيزياء الليزر وتطبيقاتها", hours: 2, isElective: false },
+{ name: "فيزياء إحصائية 1", hours: 2, isElective: false },
+{ name: "توبولوجي 2", hours: 2, isElective: true, group: "mp_y3t2g1", id: "mp_y3t2_topology2" },
+{ name: "موضوعات مختارة في الرياضيات 2", hours: 2, isElective: true, group: "mp_y3t2g1", id: "mp_y3t2_selected_topics_math2" },
+{ name: "ميكانيكا نسبية", hours: 2, isElective: true, group: "mp_y3t2g2", id: "mp_y3t2_relativistic_mech" },
+{ name: "فيزياء ذرية وجزيئية", hours: 2, isElective: true, group: "mp_y3t2g2", id: "mp_y3t2_atomic_molecular_physics" }
+]
+},
+4: {
+t1: [
+{ name: "مشروع تخرج", hours: 2, isElective: false },
+{ name: "تحليل مركب 1", hours: 2, isElective: false },
+{ name: "هندسة تفاضلية 1", hours: 2, isElective: false },
+{ name: "معادلات تفاضلية جزئية 1", hours: 2, isElective: false },
+{ name: "فيزياء عملية", hours: 4, isElective: false },
+{ name: "فيزياء نووية 1", hours: 2, isElective: false },
+{ name: "فيزياء جوامد 1", hours: 2, isElective: false },
+{ name: "تحليل دالي", hours: 2, isElective: true, group: "mp_y4t1g1", id: "mp_y4t1_functional_analysis" },
+{ name: "موضوعات مختارة في الرياضيات 3", hours: 2, isElective: true, group: "mp_y4t1g1", id: "mp_y4t1_selected_topics_math3" },
+{ name: "فيزياء الطاقة المتجددة", hours: 2, isElective: true, group: "mp_y4t1g2", id: "mp_y4t1_renewable_energy_physics" },
+{ name: "مقرر اختياري فيزياء 1", hours: 2, isElective: true, group: "mp_y4t1g2", id: "mp_y4t1_physics_elective1" }
+],
+t2: [
+{ name: "فيزياء عملية", hours: 4, isElective: false },
+{ name: "ميكانيكا الكم 2", hours: 2, isElective: false },
+{ name: "فيزياء نووية 2", hours: 2, isElective: false },
+{ name: "فيزياء الجوامد 2", hours: 2, isElective: false },
+{ name: "تحليل مركب 2", hours: 2, isElective: false },
+{ name: "هندسة تفاضلية 2", hours: 2, isElective: false },
+{ name: "معادلات تفاضلية جزئية 2", hours: 2, isElective: true, group: "mp_y4t2g1", id: "mp_y4t2_pde2" },
+{ name: "موضوعات مختارة في الرياضيات 4", hours: 2, isElective: true, group: "mp_y4t2g1", id: "mp_y4t2_selected_topics_math4" },
+{ name: "فيزياء البلازما", hours: 2, isElective: true, group: "mp_y4t2g2", id: "mp_y4t2_plasma_physics" },
+{ name: "موضوعات مختارة في الفيزياء 2", hours: 2, isElective: true, group: "mp_y4t2g2", id: "mp_y4t2_selected_topics_physics2" }
+]
 }
 },
 physics_chem: {
@@ -931,6 +1396,87 @@ t2: [
 { name: "تاريخ وفلسفة العلوم", hours: 2, isElective: true, group: "pc_t2g2", id: "pc_history_sci" },
 { name: "حقوق الانسان ومكافحة الفساد", hours: 2, isElective: true, group: "pc_t2g2", id: "pc_human_rights" }
 ]
+},
+2: {
+t1: [
+{ name: "تحليل وعرض بيانات", hours: 2, isElective: false },
+{ name: "كيمياء تحليلية وفيزيائية", hours: 2, isElective: false },
+{ name: "فيزياء عامة 2", hours: 2, isElective: false },
+{ name: "تفاضل وتكامل 2", hours: 2, isElective: false },
+{ name: "مقدمة في التقسيم والميكروبيولوجي", hours: 2, isElective: false },
+{ name: "فيزياء رياضية 1", hours: 2, isElective: false },
+{ name: "كيمياء عامة 3", hours: 2, isElective: false },
+{ name: "دوائر كهربية", hours: 2, isElective: true, group: "pc_y2t1g1", id: "pc_y2t1_electric_circuits" },
+{ name: "كهرومغناطيسية 1", hours: 2, isElective: true, group: "pc_y2t1g1", id: "pc_y2t1_electromagnetism1" },
+{ name: "كيمياء تطبيقية", hours: 2, isElective: true, group: "pc_y2t1g2", id: "pc_y2t1_applied_chem" },
+{ name: "كيمياء تحويلات الطاقة", hours: 2, isElective: true, group: "pc_y2t1g2", id: "pc_y2t1_energy_conversion_chem" }
+],
+t2: [
+{ name: "تطوير مواقع الويب", hours: 2, isElective: false },
+{ name: "فيزياء عامة 3", hours: 2, isElective: false },
+{ name: "تفاضل وتكامل متقدم", hours: 2, isElective: false },
+{ name: "أساسيات علم الحيوان 2 (اللافقاريات والفقاريات)", hours: 2, isElective: false },
+{ name: "المركبات العضوية أحادية المجموعة", hours: 2, isElective: false },
+{ name: "فيزياء رياضية 1", hours: 2, isElective: false },
+{ name: "بصريات فيزيائية 1", hours: 2, isElective: true, group: "pc_y2t2g1", id: "pc_y2t2_physical_optics1" },
+{ name: "موجات", hours: 2, isElective: true, group: "pc_y2t2g1", id: "pc_y2t2_waves" },
+{ name: "كيمياء المركبات الأروماتية", hours: 2, isElective: true, group: "pc_y2t2g2", id: "pc_y2t2_aromatic_chem" },
+{ name: "كيمياء أشباه الموصلات", hours: 2, isElective: true, group: "pc_y2t2g2", id: "pc_y2t2_semiconductors_chem" }
+]
+},
+3: {
+t1: [
+{ name: "جيولوجيا عامة 2", hours: 2, isElective: false },
+{ name: "كيمياء العناصر الانتقالية", hours: 2, isElective: false },
+{ name: "كيمياء الديناميكا الحرارية", hours: 2, isElective: false },
+{ name: "كيمياء عضوية فيزيائية", hours: 2, isElective: false },
+{ name: "إلكترونيات تماثلية", hours: 2, isElective: false },
+{ name: "فيزياء رياضية 1", hours: 2, isElective: false },
+{ name: "بلورات وأشعة", hours: 2, isElective: true, group: "pc_y3t1g1", id: "pc_y3t1_crystals_radiation" },
+{ name: "كهرومغناطيسية 2", hours: 2, isElective: true, group: "pc_y3t1g1", id: "pc_y3t1_electromagnetism2" },
+{ name: "كيمياء السطوح", hours: 2, isElective: true, group: "pc_y3t1g2", id: "pc_y3t1_surface_chem" },
+{ name: "كيمياء الحفر", hours: 2, isElective: true, group: "pc_y3t1g2", id: "pc_y3t1_drilling_chem" }
+],
+t2: [
+{ name: "ميكانيكا كلاسيكية 1", hours: 2, isElective: false },
+{ name: "فيزياء إحصائية 1", hours: 2, isElective: false },
+{ name: "ميكانيكا الكم 1", hours: 2, isElective: false },
+{ name: "كيمياء الكم 1", hours: 2, isElective: false },
+{ name: "كيمياء حركية التفاعلات الكيميائية", hours: 2, isElective: false },
+{ name: "كيمياء المحاليل الإلكتروليتية والخلايا الكهربية", hours: 2, isElective: false },
+{ name: "كيمياء البلمرات الطبيعية", hours: 2, isElective: false },
+{ name: "فيزياء الليزر وتطبيقاتها", hours: 2, isElective: true, group: "pc_y3t2g1", id: "pc_y3t2_laser_physics" },
+{ name: "فيزياء ذرية وجزيئية", hours: 2, isElective: true, group: "pc_y3t2g1", id: "pc_y3t2_atomic_molecular_physics" },
+{ name: "التحليل باستخدام الأجهزة", hours: 2, isElective: true, group: "pc_y3t2g2", id: "pc_y3t2_instrumental_analysis" },
+{ name: "التحليل الكروماتوجرافي", hours: 2, isElective: true, group: "pc_y3t2g2", id: "pc_y3t2_chromatographic_analysis" }
+]
+},
+4: {
+t1: [
+{ name: "مشروع تخرج", hours: 2, isElective: false },
+{ name: "كيمياء عضوية غير متجانسة الحلقات", hours: 2, isElective: false },
+{ name: "كيمياء الكم 2", hours: 2, isElective: false },
+{ name: "كيمياء البلمرات الفيزيائية", hours: 2, isElective: false },
+{ name: "ميكانيكا الكم 2", hours: 2, isElective: false },
+{ name: "فيزياء جوامد 1", hours: 2, isElective: false },
+{ name: "فيزياء نووية 1", hours: 2, isElective: false },
+{ name: "فيزياء الطاقة المتجددة", hours: 2, isElective: true, group: "pc_y4t1g1", id: "pc_y4t1_renewable_energy_physics" },
+{ name: "موضوعات مختارة في الفيزياء 1", hours: 2, isElective: true, group: "pc_y4t1g1", id: "pc_y4t1_selected_topics_physics1" },
+{ name: "كيمياء عضوية حلقية وعديدة الحلقات", hours: 2, isElective: true, group: "pc_y4t1g2", id: "pc_y4t1_cyclic_polycyclic_chem" },
+{ name: "كيمياء عضوية فلزية", hours: 2, isElective: true, group: "pc_y4t1g2", id: "pc_y4t1_organometallic_chem" }
+],
+t2: [
+{ name: "كيمياء إشعاعية ونووية", hours: 2, isElective: false },
+{ name: "ميكانيكا التفاعلات العضوية", hours: 2, isElective: false },
+{ name: "كيمياء الأطياف الجزيئية التطبيقية", hours: 2, isElective: false },
+{ name: "الوقاية من الإشعاع", hours: 2, isElective: false },
+{ name: "فيزياء إحصائية 2", hours: 2, isElective: false },
+{ name: "موضوعات مختارة في الفيزياء 2", hours: 2, isElective: false },
+{ name: "فيزياء الجوامد 2", hours: 2, isElective: true, group: "pc_y4t2g1", id: "pc_y4t2_solid_state_physics2" },
+{ name: "فيزياء الجسيمات الأولية", hours: 2, isElective: true, group: "pc_y4t2g1", id: "pc_y4t2_elementary_particle_physics" },
+{ name: "كيمياء فراغية", hours: 2, isElective: true, group: "pc_y4t2g2", id: "pc_y4t2_stereochemistry" },
+{ name: "التحليل الحراري", hours: 2, isElective: true, group: "pc_y4t2g2", id: "pc_y4t2_thermal_analysis" }
+]
 }
 },
 geo_chem: {
@@ -954,6 +1500,87 @@ t2: [
 { name: "كيمياء عضوية وحيوية", hours: 2, isElective: false },
 { name: "تاريخ وفلسفة العلوم", hours: 2, isElective: true, group: "gc_t2g1", id: "gc_history_sci" },
 { name: "حقوق الانسان ومكافحة الفساد", hours: 2, isElective: true, group: "gc_t2g1", id: "gc_human_rights" }
+]
+},
+2: {
+t1: [
+{ name: "تحليل وعرض بيانات", hours: 2, isElective: false },
+{ name: "كيمياء تحليلية وفيزيائية", hours: 2, isElective: false },
+{ name: "فيزياء عامة 2", hours: 2, isElective: false },
+{ name: "رياضة عامة 1", hours: 2, isElective: false },
+{ name: "مقدمة في التقسيم والميكروبيولوجي", hours: 2, isElective: false },
+{ name: "حفريات كبيرة", hours: 2, isElective: false },
+{ name: "كيمياء عضوية 3", hours: 2, isElective: false },
+{ name: "علم المساحة", hours: 2, isElective: true, group: "gc_y2t1g1", id: "gc_y2t1_surveying" },
+{ name: "حفريات دقيقة", hours: 2, isElective: true, group: "gc_y2t1g1", id: "gc_y2t1_micropaleontology" },
+{ name: "كيمياء المركبات الأروماتية", hours: 2, isElective: true, group: "gc_y2t1g2", id: "gc_y2t1_aromatic_chem" },
+{ name: "كيمياء تحاليل التربة", hours: 2, isElective: true, group: "gc_y2t1g2", id: "gc_y2t1_soil_analysis_chem" }
+],
+t2: [
+{ name: "تطوير مواقع الويب", hours: 2, isElective: false },
+{ name: "فيزياء عامة 3", hours: 2, isElective: false },
+{ name: "رياضة عامة 2", hours: 2, isElective: false },
+{ name: "أساسيات علم الحيوان 2 (اللافقاريات وفقاريات)", hours: 2, isElective: false },
+{ name: "كيمياء غير عضوية 3", hours: 2, isElective: false },
+{ name: "بصريات وبصريات المعادن", hours: 2, isElective: false },
+{ name: "طبقات حيوية", hours: 2, isElective: true, group: "gc_y2t2g1", id: "gc_y2t2_biostratigraphy" },
+{ name: "بيئات قديمة", hours: 2, isElective: true, group: "gc_y2t2g1", id: "gc_y2t2_paleoenvironments" },
+{ name: "التحليل باستخدام الأجهزة", hours: 2, isElective: true, group: "gc_y2t2g2", id: "gc_y2t2_instrumental_analysis" },
+{ name: "التحليل الحراري", hours: 2, isElective: true, group: "gc_y2t2g2", id: "gc_y2t2_thermal_analysis" }
+]
+},
+3: {
+t1: [
+{ name: "صخور نارية", hours: 2, isElective: false },
+{ name: "كيمياء الممثلة والانتقالية", hours: 2, isElective: false },
+{ name: "كيمياء الديناميكا الحرارية", hours: 2, isElective: false },
+{ name: "كيمياء التركيب والطيف الجزيئي", hours: 2, isElective: false },
+{ name: "صخور متحولة", hours: 2, isElective: false },
+{ name: "طبقات صخرية", hours: 2, isElective: false },
+{ name: "صخور رسوبية", hours: 2, isElective: false },
+{ name: "ميكانيكا الصخور", hours: 2, isElective: true, group: "gc_y3t1g1", id: "gc_y3t1_rock_mechanics" },
+{ name: "آثار حفرية", hours: 2, isElective: true, group: "gc_y3t1g1", id: "gc_y3t1_trace_fossils" },
+{ name: "كيمياء عضوية فلزية", hours: 2, isElective: true, group: "gc_y3t1g2", id: "gc_y3t1_organometallic_chem" },
+{ name: "كيمياء تطبيقية", hours: 2, isElective: true, group: "gc_y3t1g2", id: "gc_y3t1_applied_chem" }
+],
+t2: [
+{ name: "جيولوجيا تركيبية", hours: 2, isElective: false },
+{ name: "تخريط حقلي ودراسات حقلية", hours: 2, isElective: false },
+{ name: "جيوفيزياء", hours: 2, isElective: false },
+{ name: "كيمياء عضوية فيزيائية", hours: 2, isElective: false },
+{ name: "كيمياء حركية التفاعلات الكيميائية", hours: 2, isElective: false },
+{ name: "كيمياء عضوية غير متجانسة الحلقات", hours: 2, isElective: false },
+{ name: "جيولوجيا هندسية", hours: 2, isElective: true, group: "gc_y3t2g1", id: "gc_y3t2_engineering_geology" },
+{ name: "جيو كيمياء", hours: 2, isElective: true, group: "gc_y3t2g1", id: "gc_y3t2_geochemistry" },
+{ name: "كيمياء عضوية حلقية وعديدة الحلقات", hours: 2, isElective: true, group: "gc_y3t2g2", id: "gc_y3t2_cyclic_polycyclic_chem" },
+{ name: "كيمياء السبائك", hours: 2, isElective: true, group: "gc_y3t2g2", id: "gc_y3t2_alloys_chem" }
+]
+},
+4: {
+t1: [
+{ name: "مشروع تخرج", hours: 2, isElective: false },
+{ name: "كيمياء الاطياف الجزيئية التطبيقية", hours: 2, isElective: false },
+{ name: "كيمياء البلمرات الطبيعية", hours: 2, isElective: false },
+{ name: "جيولوجية مصر", hours: 2, isElective: false },
+{ name: "جيولوجية المياه", hours: 2, isElective: false },
+{ name: "جيولوجيا البترول", hours: 2, isElective: false },
+{ name: "الاستشعار عن بعد", hours: 2, isElective: false },
+{ name: "جيولوجيا تحت سطحية", hours: 2, isElective: true, group: "gc_y4t1g1", id: "gc_y4t1_subsurface_geology" },
+{ name: "جيولوجيا اقتصادية", hours: 2, isElective: true, group: "gc_y4t1g1", id: "gc_y4t1_economic_geology" },
+{ name: "كيمياء البترول", hours: 2, isElective: true, group: "gc_y4t1g2", id: "gc_y4t1_petroleum_chem" },
+{ name: "كيمياء البتروكيماويات", hours: 2, isElective: true, group: "gc_y4t1g2", id: "gc_y4t1_petrochemicals_chem" }
+],
+t2: [
+{ name: "كيمياء إشعاعية ونووية", hours: 2, isElective: false },
+{ name: "ميكانيكا التفاعلات العضوية", hours: 2, isElective: false },
+{ name: "كيمياء البلمرات الفيزيائية", hours: 2, isElective: false },
+{ name: "كيمياء كهربية", hours: 2, isElective: false },
+{ name: "معادن الخامات", hours: 2, isElective: false },
+{ name: "جيولوجيا حقلية", hours: 2, isElective: false },
+{ name: "ميكانيكا الصخور", hours: 2, isElective: true, group: "gc_y4t2g1", id: "gc_y4t2_rock_mechanics" },
+{ name: "جيولوجيا البيئة", hours: 2, isElective: true, group: "gc_y4t2g1", id: "gc_y4t2_environmental_geology" },
+{ name: "كيمياء التطبيقات النانومترية للتربة", hours: 2, isElective: true, group: "gc_y4t2g2", id: "gc_y4t2_soil_nano_applications_chem" },
+{ name: "التلوث البيئي", hours: 2, isElective: true, group: "gc_y4t2g2", id: "gc_y4t2_environmental_pollution" }
 ]
 }
 },
@@ -1077,6 +1704,33 @@ t2: [
 { name: "ك المنتجات الطبيعة", hours: 2, isElective: true, group: "zc_y3t2g2", id: "zc_y3t2_natural_products_chem" },
 { name: "ك المواد الملونة", hours: 2, isElective: true, group: "zc_y3t2g2", id: "zc_y3t2_colorants_chem" }
 ]
+},
+4: {
+t1: [
+{ name: "مشروع تخرج", hours: 2, isElective: false },
+{ name: "كيمياء الاطياف الجزيئية التطبيقية", hours: 2, isElective: false },
+{ name: "كيمياء كهربية", hours: 2, isElective: false },
+{ name: "الكيمياء الطبيعية للبلمرات", hours: 2, isElective: false },
+{ name: "مناعة الأمراض المعدية ومناعة متقدمة", hours: 3, isElective: false },
+{ name: "فسيولوجي 3", hours: 2, isElective: false },
+{ name: "علم الأجنة", hours: 2, isElective: false },
+{ name: "علم الطفيليات 1", hours: 2, isElective: true, group: "zc_y4t1g1", id: "zc_y4t1_parasitology1" },
+{ name: "لافقاريات 2", hours: 2, isElective: true, group: "zc_y4t1g1", id: "zc_y4t1_invertebrates2" },
+{ name: "كيمياء عضوية حلقية وعديدة الحلقات", hours: 2, isElective: true, group: "zc_y4t1g2", id: "zc_y4t1_cyclic_polycyclic_chem" },
+{ name: "كيمياء عضوية فلزية", hours: 2, isElective: true, group: "zc_y4t1g2", id: "zc_y4t1_organometallic_chem" }
+],
+t2: [
+{ name: "كيمياء إشعاعية ونووية", hours: 2, isElective: false },
+{ name: "كيمياء البلمرات الفيزيائية", hours: 2, isElective: false },
+{ name: "ميكانيكية التفاعلات العضوية", hours: 2, isElective: false },
+{ name: "كيمياء أنسجة", hours: 2, isElective: false },
+{ name: "فسيولوجي 4", hours: 2, isElective: false },
+{ name: "بيولوجيا جزيئية", hours: 2, isElective: false },
+{ name: "علم الطفيليات 2", hours: 2, isElective: true, group: "zc_y4t2g1", id: "zc_y4t2_parasitology2" },
+{ name: "لافقاريات 3", hours: 2, isElective: true, group: "zc_y4t2g1", id: "zc_y4t2_invertebrates3" },
+{ name: "كيمياء المبيدات", hours: 2, isElective: true, group: "zc_y4t2g2", id: "zc_y4t2_pesticides_chem" },
+{ name: "التحليل الحراري", hours: 2, isElective: true, group: "zc_y4t2g2", id: "zc_y4t2_thermal_analysis" }
+]
 }
 }
 };
@@ -1113,6 +1767,7 @@ if (!entry) return;
 const cb = row.querySelector('.elective-radio');
 if (cb) cb.checked = !!entry.radioChecked;
 });
+rebuildGroupOrderFromDOM(tbody);
 refreshElectiveGroupStates(tbody);
 rows.forEach(row => {
 const nameCell = row.querySelector('td:nth-child(2)');
@@ -1180,7 +1835,7 @@ const body = document.createElement('div');
 body.className = 'accordion-body';
 const tc = document.createElement('div');
 tc.className = 'table-container';
-tc.style.cssText = 'margin-top:0;border-radius:0;border:none;border-top:1px solid #eee;';
+tc.style.cssText = 'margin-top:0;';
 const table = document.createElement('table');
 table.innerHTML = `<colgroup><col class="col-select"><col class="col-name"><col class="col-hours"><col class="col-score"><col class="col-gpa"></colgroup><thead><tr><th>اختر</th><th>المادة</th><th>الساعات</th><th>درجتك من 100</th><th>GPA المادة</th></tr></thead>`;
 const tbody = document.createElement('tbody');
@@ -1214,9 +1869,16 @@ const term = selectedRadio ? selectedRadio.value : '';
 const tableWrapper = document.getElementById('dynamic-table-wrapper');
 const accordionWrapper = document.getElementById('accordion-wrapper');
 const placeholder = document.getElementById('placeholder-message');
+const methodWrapper = document.getElementById('method-wrapper');
+const shortcutWrapper = document.getElementById('shortcut-wrapper');
 const tbody = document.getElementById('subjects-body');
 tbody.innerHTML = '';
 accordionWrapper.innerHTML = '';
+document.getElementById('shortcut-accordion').innerHTML = '';
+document.getElementById('prev-gpa').value = '';
+uncheckMethodRadios();
+methodWrapper.classList.add('hidden');
+shortcutWrapper.classList.add('hidden');
 document.getElementById('result-box').style.display = 'none';
 showError('');
 const baseData = coursesData[dept] && coursesData[dept][year];
@@ -1224,23 +1886,20 @@ if (term === 'total') {
 const t1 = baseData && coursesData[dept][year]['t1'];
 const t2 = baseData && coursesData[dept][year]['t2'];
 if (t1 && t2) {
-for (let y = 1; y <= year; y++) {
-const yt1 = coursesData[dept] && coursesData[dept][y] && coursesData[dept][y]['t1'];
-const yt2 = coursesData[dept] && coursesData[dept][y] && coursesData[dept][y]['t2'];
-if (!yt1 || !yt2) continue;
-const allSubjects = [...yt1, ...yt2];
-const t1Num = (y - 1) * 2 + 1;
-const t2Num = (y - 1) * 2 + 2;
-buildAccordionPanel(accordionWrapper, `الترم ${t1Num}`, yt1, allSubjects, y, 't1');
-buildAccordionPanel(accordionWrapper, `الترم ${t2Num}`, yt2, allSubjects, y, 't2');
-}
-accordionWrapper.querySelectorAll('.term-tbody').forEach(tb => {
-restoreGrades(dept, tb.dataset.saveYear, tb.dataset.saveTerm, tb);
-});
-accordionWrapper.classList.remove('hidden');
+if (year >= 2) {
+// From year 2 onwards, let the user pick how they want to calculate
+// the cumulative GPA before showing any course tables.
+accordionWrapper.classList.add('hidden');
+tableWrapper.classList.add('hidden');
+placeholder.classList.add('hidden');
+methodWrapper.classList.remove('hidden');
+document.getElementById('content-footer').classList.add('hidden');
+} else {
+buildManualTotalAccordion(dept, year);
 tableWrapper.classList.add('hidden');
 placeholder.classList.add('hidden');
 showFooter();
+}
 } else {
 accordionWrapper.classList.add('hidden');
 tableWrapper.classList.add('hidden');
@@ -1262,26 +1921,146 @@ placeholder.classList.remove('hidden');
 document.getElementById('content-footer').classList.add('hidden');
 }
 }
+function buildManualTotalAccordion(dept, year) {
+const accordionWrapper = document.getElementById('accordion-wrapper');
+accordionWrapper.innerHTML = '';
+for (let y = 1; y <= year; y++) {
+const yt1 = coursesData[dept] && coursesData[dept][y] && coursesData[dept][y]['t1'];
+const yt2 = coursesData[dept] && coursesData[dept][y] && coursesData[dept][y]['t2'];
+if (!yt1 || !yt2) continue;
+const allSubjects = [...yt1, ...yt2];
+const t1Num = (y - 1) * 2 + 1;
+const t2Num = (y - 1) * 2 + 2;
+buildAccordionPanel(accordionWrapper, `الترم ${t1Num}`, yt1, allSubjects, y, 't1');
+buildAccordionPanel(accordionWrapper, `الترم ${t2Num}`, yt2, allSubjects, y, 't2');
+}
+accordionWrapper.querySelectorAll('.term-tbody').forEach(tb => {
+restoreGrades(dept, tb.dataset.saveYear, tb.dataset.saveTerm, tb);
+});
+accordionWrapper.classList.remove('hidden');
+}
+function handleMethodChange() {
+const dept = document.getElementById('department').value;
+const year = parseInt(document.getElementById('year').value);
+const methodRadio = document.querySelector('input[name="method-select"]:checked');
+const method = methodRadio ? methodRadio.value : '';
+const accordionWrapper = document.getElementById('accordion-wrapper');
+const shortcutWrapper = document.getElementById('shortcut-wrapper');
+const shortcutAccordion = document.getElementById('shortcut-accordion');
+document.getElementById('result-box').style.display = 'none';
+document.getElementById('pdf-section').classList.add('hidden');
+showError('');
+if (method === 'manual') {
+shortcutWrapper.classList.add('hidden');
+shortcutAccordion.innerHTML = '';
+buildManualTotalAccordion(dept, year);
+showFooter();
+} else if (method === 'shortcut') {
+accordionWrapper.classList.add('hidden');
+accordionWrapper.innerHTML = '';
+shortcutAccordion.innerHTML = '';
+const yt1 = coursesData[dept][year]['t1'];
+const yt2 = coursesData[dept][year]['t2'];
+const allSubjects = [...yt1, ...yt2];
+const t1Num = (year - 1) * 2 + 1;
+const t2Num = (year - 1) * 2 + 2;
+buildAccordionPanel(shortcutAccordion, `الترم ${t1Num}`, yt1, allSubjects, year, 't1');
+buildAccordionPanel(shortcutAccordion, `الترم ${t2Num}`, yt2, allSubjects, year, 't2');
+shortcutAccordion.querySelectorAll('.term-tbody').forEach(tb => {
+restoreGrades(dept, tb.dataset.saveYear, tb.dataset.saveTerm, tb);
+});
+restorePrevGpa(dept, year);
+shortcutWrapper.classList.remove('hidden');
+showFooter();
+} else {
+accordionWrapper.classList.add('hidden');
+shortcutWrapper.classList.add('hidden');
+document.getElementById('content-footer').classList.add('hidden');
+}
+}
+function handlePrevGpaInput() {
+showError('');
+}
+function isShortcutMode() {
+const sw = document.getElementById('shortcut-wrapper');
+return sw && !sw.classList.contains('hidden');
+}
+function getPrevGpaStorageKey(dept, year) {
+return `gpa_prevgpa_${dept}_y${year}`;
+}
+function savePrevGpa(dept, year, value) {
+try { localStorage.setItem(getPrevGpaStorageKey(dept, year), value); } catch(e) {}
+}
+function restorePrevGpa(dept, year) {
+let val;
+try { val = localStorage.getItem(getPrevGpaStorageKey(dept, year)); } catch(e) {}
+const input = document.getElementById('prev-gpa');
+if (input) input.value = val || '';
+}
+function calcTermStandardHours(dept, year, term) {
+const subjects = coursesData[dept] && coursesData[dept][year] && coursesData[dept][year][term];
+if (!subjects) return 0;
+let hours = 0;
+const groupsSeen = {};
+subjects.forEach(s => {
+if (!s.isElective) {
+hours += s.hours;
+} else if (!groupsSeen[s.group]) {
+groupsSeen[s.group] = true;
+const pick = s.pick || 1;
+hours += pick * s.hours;
+}
+});
+return hours;
+}
+function calcYearsStandardHours(dept, fromYear, toYear) {
+let total = 0;
+for (let y = fromYear; y <= toYear; y++) {
+total += calcTermStandardHours(dept, y, 't1');
+total += calcTermStandardHours(dept, y, 't2');
+}
+return total;
+}
 function refreshElectiveGroupStates(scopeEl) {
 const groups = new Set();
 scopeEl.querySelectorAll('.course-row[data-group]').forEach(r => groups.add(r.getAttribute('data-group')));
 groups.forEach(g => {
 const groupRows = Array.from(scopeEl.querySelectorAll(`.course-row[data-group="${g}"]`));
-const pick = parseInt(groupRows[0].getAttribute('data-pick')) || 1;
-const checkedCount = groupRows.filter(r => r.querySelector('.elective-radio').checked).length;
 groupRows.forEach(r => {
 const cb = r.querySelector('.elective-radio');
 const input = r.querySelector('.score');
 if (cb.checked) {
 r.classList.remove('disabled-course');
 if (input) input.disabled = false;
-cb.disabled = false;
 } else {
 r.classList.add('disabled-course');
 if (input) { input.disabled = true; }
-cb.disabled = checkedCount >= pick;
 }
+// Circles stay clickable at all times - never locked - so the user can
+// switch their pick freely without having to deselect the old one first.
+cb.disabled = false;
 });
+});
+}
+function clearRowScore(row) {
+const input = row.querySelector('.score');
+if (input) input.value = '';
+const pts = row.querySelector('.row-points'); if (pts) pts.innerText = '-';
+const code = row.querySelector('.row-code'); if (code) code.innerText = '';
+}
+function getGroupOrder(tbody, group) {
+if (!tbody._groupOrder) tbody._groupOrder = {};
+if (!tbody._groupOrder[group]) tbody._groupOrder[group] = [];
+return tbody._groupOrder[group];
+}
+function rebuildGroupOrderFromDOM(tbody) {
+tbody._groupOrder = {};
+const rows = Array.from(tbody.querySelectorAll('.course-row[data-group]'));
+const groups = new Set(rows.map(r => r.getAttribute('data-group')));
+groups.forEach(g => {
+tbody._groupOrder[g] = rows
+.filter(r => r.getAttribute('data-group') === g && r.querySelector('.elective-radio').checked)
+.map(r => r.id);
 });
 }
 function toggleElectiveCheckbox(checkboxEl) {
@@ -1289,18 +2068,28 @@ const row = checkboxEl.closest('tr');
 const tbody = checkboxEl.closest('tbody');
 const group = row.getAttribute('data-group');
 const pick = parseInt(row.getAttribute('data-pick')) || 1;
-const groupRows = Array.from(tbody.querySelectorAll(`.course-row[data-group="${group}"]`));
-const checkedCount = groupRows.filter(r => r.querySelector('.elective-radio').checked).length;
-if (checkedCount > pick) {
-checkboxEl.checked = false;
-showError(pick === 1 ? "من فضلك اختر مادة واحدة فقط من هذه المجموعة!" : `من فضلك اختر ${pick} مواد فقط من هذه المجموعة!`);
-return;
+const order = getGroupOrder(tbody, group);
+if (checkboxEl.checked) {
+// Selecting this one: put it at the end of the pick order, and if that
+// now exceeds the allowed number, automatically drop the oldest pick(s)
+// instead of blocking the click - so any circle can be tapped directly.
+const idx = order.indexOf(row.id);
+if (idx !== -1) order.splice(idx, 1);
+order.push(row.id);
+while (order.length > pick) {
+const oldestId = order.shift();
+if (oldestId === row.id) continue;
+const oldestRow = tbody.querySelector(`#${CSS.escape(oldestId)}`);
+if (oldestRow) {
+const oldestCb = oldestRow.querySelector('.elective-radio');
+if (oldestCb) oldestCb.checked = false;
+clearRowScore(oldestRow);
 }
-if (!checkboxEl.checked) {
-const input = row.querySelector('.score');
-if (input) input.value = '';
-const pts = row.querySelector('.row-points'); if (pts) pts.innerText = '-';
-const code = row.querySelector('.row-code'); if (code) code.innerText = '';
+}
+} else {
+const idx = order.indexOf(row.id);
+if (idx !== -1) order.splice(idx, 1);
+clearRowScore(row);
 }
 refreshElectiveGroupStates(tbody);
 showError("");
@@ -1309,6 +2098,11 @@ function resetBelow(stage) {
 document.getElementById('dynamic-table-wrapper').classList.add('hidden');
 document.getElementById('accordion-wrapper').classList.add('hidden');
 document.getElementById('accordion-wrapper').innerHTML = '';
+document.getElementById('method-wrapper').classList.add('hidden');
+document.getElementById('shortcut-wrapper').classList.add('hidden');
+document.getElementById('shortcut-accordion').innerHTML = '';
+document.getElementById('prev-gpa').value = '';
+uncheckMethodRadios();
 document.getElementById('content-footer').classList.add('hidden');
 document.getElementById('pdf-section').classList.add('hidden');
 document.getElementById('placeholder-message').classList.add('hidden');
@@ -1323,6 +2117,10 @@ uncheckRadios();
 }
 function uncheckRadios() {
 const radios = document.querySelectorAll('input[name="term-select"]');
+radios.forEach(radio => radio.checked = false);
+}
+function uncheckMethodRadios() {
+const radios = document.querySelectorAll('input[name="method-select"]');
 radios.forEach(radio => radio.checked = false);
 }
 function getPrecisePoints(score) {
@@ -1389,11 +2187,68 @@ errorBox.style.display = 'block';
 errorBox.style.display = 'none';
 }
 }
+function clearTbodyInputs(tbody) {
+tbody.querySelectorAll('.course-row').forEach(row => {
+const scoreInput = row.querySelector('.score');
+const cb = row.querySelector('.elective-radio');
+if (cb) cb.checked = false;
+if (scoreInput) scoreInput.value = '';
+const pts = row.querySelector('.row-points'); if (pts) pts.innerText = '-';
+const code = row.querySelector('.row-code'); if (code) code.innerText = '';
+});
+tbody._groupOrder = {};
+refreshElectiveGroupStates(tbody);
+}
+function resetCurrentSection() {
+const dept = document.getElementById('department').value;
+const year = parseInt(document.getElementById('year').value);
+const selectedRadio = document.querySelector('input[name="term-select"]:checked');
+const term = selectedRadio ? selectedRadio.value : '';
+if (!dept || !year || !term) return;
+document.getElementById('result-box').style.display = 'none';
+document.getElementById('pdf-section').classList.add('hidden');
+document.getElementById('student-name').value = '';
+showError('');
+if (term === 'total') {
+if (isShortcutMode()) {
+document.querySelectorAll('#shortcut-accordion .term-tbody').forEach(tb => {
+clearTbodyInputs(tb);
+if (tb.dataset.saveYear && tb.dataset.saveTerm) {
+try { localStorage.removeItem(getStorageKey(dept, tb.dataset.saveYear, tb.dataset.saveTerm)); } catch(e) {}
+}
+});
+document.getElementById('prev-gpa').value = '';
+try { localStorage.removeItem(getPrevGpaStorageKey(dept, year)); } catch(e) {}
+} else {
+document.querySelectorAll('#accordion-wrapper .term-tbody').forEach(tb => {
+clearTbodyInputs(tb);
+if (tb.dataset.saveYear && tb.dataset.saveTerm) {
+try { localStorage.removeItem(getStorageKey(dept, tb.dataset.saveYear, tb.dataset.saveTerm)); } catch(e) {}
+}
+});
+}
+} else {
+const tbody = document.getElementById('subjects-body');
+clearTbodyInputs(tbody);
+try { localStorage.removeItem(getStorageKey(dept, year, term)); } catch(e) {}
+}
+}
 function calculateGPA() {
 const dept = document.getElementById('department').value;
 const year = parseInt(document.getElementById('year').value);
 const selectedRadio = document.querySelector('input[name="term-select"]:checked');
 const term = selectedRadio ? selectedRadio.value : '';
+const shortcutMode = term === 'total' && isShortcutMode();
+let prevGpa = 0, prevHours = 0;
+if (shortcutMode) {
+const prevGpaInput = document.getElementById('prev-gpa');
+prevGpa = parseFloat(prevGpaInput.value);
+if (prevGpaInput.value === '' || isNaN(prevGpa) || prevGpa < 0 || prevGpa > 5) {
+showError("من فضلك أدخل آخر GPA تراكمي عام صحيح (رقم بين 0 و 5) أولاً.");
+return;
+}
+prevHours = calcYearsStandardHours(dept, 1, year - 1);
+}
 if (term === 'total') {
 const tbodies = document.querySelectorAll('.term-tbody');
 tbodies.forEach(tb => {
@@ -1416,7 +2271,7 @@ const groupRows = Array.from(electiveRows).filter(r => r.getAttribute('data-grou
 const pick = parseInt(groupRows[0].getAttribute('data-pick')) || 1;
 const checkedCount = groupRows.filter(r => r.querySelector('.elective-radio') && r.querySelector('.elective-radio').checked).length;
 if (checkedCount !== pick) {
-showError(pick === 1 ? "من فضلك اختر مادة اختيارية واحدة من الجدول أولاً!" : `من فضلك اختر ${pick} مواد اختيارية من كل مجموعة أولاً!`);
+showError("من فضلك اختر مادة اختيارية واحدة من الجدول أولاً!");
 return;
 }
 }
@@ -1435,7 +2290,15 @@ showError("من فضلك أدخل كل درجات المواد المفعلة أ
 return;
 }
 showError("");
-const gpa = totalWeight / totalHours;
+let gpa;
+if (shortcutMode) {
+savePrevGpa(dept, year, document.getElementById('prev-gpa').value);
+const combinedWeight = (prevGpa * prevHours) + totalWeight;
+const combinedHours = prevHours + totalHours;
+gpa = combinedWeight / combinedHours;
+} else {
+gpa = totalWeight / totalHours;
+}
 document.getElementById('result-box').style.display = 'block';
 document.getElementById('gpa-display').innerText = gpa.toFixed(3);
 document.getElementById('grade-label-text').innerText = getGradeLabelText(gpa);
@@ -1532,7 +2395,15 @@ drawSmartLine(doc, `Student Name: ${studentName}`, 14, 38, { fontSize: 40, fontW
 const deptName = deptEl.options[deptEl.selectedIndex].text;
 drawSmartLine(doc, `Department: ${deptName}   |   Academic Year: ${yearName}`, 14, 45, { fontSize: 40, fontWeight: 600, color: '#2c3e50', heightMM: 4.3, align: 'left' });
 let currentY = 52;
-const isTotalMode = !document.getElementById('accordion-wrapper').classList.contains('hidden');
+const selectedRadioForPdf = document.querySelector('input[name="term-select"]:checked');
+const termForPdf = selectedRadioForPdf ? selectedRadioForPdf.value : '';
+const shortcutModeForPdf = termForPdf === 'total' && isShortcutMode();
+if (shortcutModeForPdf) {
+const prevGpaVal = document.getElementById('prev-gpa').value;
+drawSmartLine(doc, `Previous Cumulative GPA (used in calculation): ${prevGpaVal}`, 14, currentY, { fontSize: 40, fontWeight: 600, color: '#2c3e50', heightMM: 4.3, align: 'left' });
+currentY += 7;
+}
+const isTotalMode = shortcutModeForPdf || !document.getElementById('accordion-wrapper').classList.contains('hidden');
 let tbodies = [];
 if (isTotalMode) {
 tbodies = document.querySelectorAll('.term-tbody');
